@@ -63,6 +63,13 @@ public class ChessPiece {
                     break;
                 case BISHOP:
                     validMoves.addAll(getBishopMoves(board, myPosition, currentPiece.getTeamColor()));
+                    break;
+                case ROOK:
+                    validMoves.addAll(getRookMoves(board, myPosition, currentPiece.getTeamColor()));
+                    break;
+                case QUEEN:
+                    validMoves.addAll(getQueenMoves(board, myPosition, currentPiece.getTeamColor()));
+
 
             }
         }
@@ -105,7 +112,7 @@ public class ChessPiece {
             if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null)
             {
                 //same color?
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != this.getTeamColor())
+                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
                     bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
                 //don't add anymore because we are blocked
                 break;
@@ -130,7 +137,7 @@ public class ChessPiece {
             if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null)
             {
                 //same color?
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != this.getTeamColor())
+                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
                     bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
                 //don't add anymore because we are blocked
                 break;
@@ -154,7 +161,7 @@ public class ChessPiece {
             if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null)
             {
                 //cant capture same color
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != this.getTeamColor())
+                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
                     bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
                 //don't add anymore because we are blocked
                 break;
@@ -177,7 +184,7 @@ public class ChessPiece {
             if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null)
             {
                 //same color??
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != this.getTeamColor())
+                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
                     bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
                 //don't add anymore because we are blocked
                 break;
@@ -195,7 +202,78 @@ public class ChessPiece {
         return bishopMoves;
     }
 
-    //returns whether a move is on the board
+    private Collection<ChessMove> getRookMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> rookMoves = new ArrayList<>();
+        //starting position
+        rookMoves.addAll(getMovesLoop(board, position, teamColor, 1, 0));
+        rookMoves.addAll(getMovesLoop(board, position, teamColor, 0, 1));
+        rookMoves.addAll(getMovesLoop(board, position, teamColor, 2, 0));
+        rookMoves.addAll(getMovesLoop(board, position, teamColor, 0, 2));
+
+        return rookMoves;
+    }
+
+
+    private Collection<ChessMove> getQueenMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> queenMoves = new ArrayList<>();
+        queenMoves.addAll(getRookMoves(board, position, teamColor));
+        queenMoves.addAll(getBishopMoves(board, position, teamColor));
+        return queenMoves;
+    }
+
+
+
+    //this is a stupid name but oh well
+    //0 is nothing, 1 add, 2 subtract
+    private Collection<ChessMove> getMovesLoop(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor, int row_op, int col_op)
+    {
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        //save it again for backwards moves (this seems inefficient but oh well)
+        int currentRow2 = position.getRow();
+        int currentCol2 = position.getColumn();
+
+        //get forward diagonal moves
+        while (isValidPosition(currentRow2, currentCol2))
+        {
+            if (row_op == 1)
+                currentRow2++;
+            if (row_op == 2)
+                currentRow2--;
+            if (col_op == 1)
+                currentCol2++;
+            if (col_op == 2)
+                currentCol2--;
+
+            if (col_op > 2 || col_op < 0)
+            {
+                throw new RuntimeException("col_op is not in acceptable range");
+            }
+            if (row_op > 2 || row_op < 0)
+            {
+                throw new RuntimeException("row_op is not in acceptable range");
+            }
+
+            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null)
+            {
+                //same color?
+                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
+                    moves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
+                //don't add anymore because we are blocked
+                break;
+            }
+
+            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) == null) {
+                moves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
+            }
+
+        }
+
+        return moves;
+    }
+
+
+        //returns whether a move is on the board
     private boolean isValidPosition(int row, int col) {
         return row >= 1 && row < 9 && col >= 1 && col < 9;
     }
