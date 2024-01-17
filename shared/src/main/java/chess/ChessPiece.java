@@ -84,10 +84,14 @@ public class ChessPiece {
 
 
         Collection<ChessMove> bishopMoves = new ArrayList<>();
+        //starting position
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
+        //save it again for backwards moves (this seems inefficient but oh well)
         int currentRow2 = position.getRow();
         int currentCol2 = position.getColumn();
+
+        //get forward diagonal moves
         while(isValidPosition(currentRow, currentCol))
         {
             currentRow++;
@@ -96,6 +100,8 @@ public class ChessPiece {
                 bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow, currentCol), null));
             }
         }
+
+        //backwards diagonal moves
         while(isValidPosition(currentRow2, currentCol2))
         {
             currentRow2--;
