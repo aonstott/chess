@@ -84,6 +84,7 @@ public class ChessPiece {
         return pawnMoves;
     }
 
+    //this function gets moves for bishop and returns as a collection
     private Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
 
 
@@ -187,13 +188,14 @@ public class ChessPiece {
             }
         }
 
-
-        for (ChessMove item : bishopMoves) {
+        //just for debugging
+        /*for (ChessMove item : bishopMoves) {
             System.out.println(item.toStr());
-        }
+        }*/
         return bishopMoves;
     }
 
+    //returns whether a move is on the board
     private boolean isValidPosition(int row, int col) {
         return row >= 1 && row < 9 && col >= 1 && col < 9;
     }
