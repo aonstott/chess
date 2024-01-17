@@ -53,8 +53,59 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(myPosition);
+        if (currentPiece != null)
+        {
+            switch (currentPiece.getPieceType())
+            {
+                case PAWN:
+
+            }
+        }
         return null;
 
+    }
+
+    private Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+
+
+        Collection<ChessMove> pawnMoves = new ArrayList<>();
+        int forwardRow = (teamColor == ChessGame.TeamColor.WHITE) ? position.getRow() + 1 : position.getRow() - 1;
+        int currentCol = position.getColumn();
+
+        if (isValidPosition(forwardRow, currentCol) && board.getPiece(new ChessPosition(forwardRow, currentCol)) == null) {
+            pawnMoves.add(new ChessMove(position, new ChessPosition(forwardRow, currentCol), null));
+        }
+
+        return pawnMoves;
+    }
+
+    private Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+
+
+        Collection<ChessMove> bishopMoves = new ArrayList<>();
+        int currentRow = position.getRow();
+        int currentCol = position.getColumn();
+        int currentRow2 = position.getRow();
+        int currentCol2 = position.getColumn();
+        while(isValidPosition(currentRow, currentCol))
+        {
+            currentRow++;
+            currentCol++;
+            if (isValidPosition(currentRow, currentCol) && board.getPiece(new ChessPosition(currentRow, currentCol)) == null) {
+                bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow, currentCol), null));
+            }
+        }
+        while(isValidPosition(currentRow2, currentCol2))
+        {
+            currentRow2--;
+            currentCol2--;
+            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) == null) {
+                bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
+            }
+        }
+
+        return bishopMoves;
     }
 
     private boolean isValidPosition(int row, int col) {
