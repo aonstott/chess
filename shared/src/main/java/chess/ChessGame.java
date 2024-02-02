@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -67,6 +68,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
+        Collection<ChessMove> valid = new ArrayList<>();
         if (!(move.getStartPosition().getRow() > 0 && move.getStartPosition().getRow() <= 8 &&  move.getStartPosition().getColumn() > 0 && move.getStartPosition().getColumn() <= 8))
         {
             throw new InvalidMoveException("Bad start position");
@@ -79,12 +81,44 @@ public class ChessGame {
         {
             throw new InvalidMoveException("No piece at start position");
         }
+        valid = piece.pieceMoves(this.board, move.getStartPosition());
+
+        System.out.println("Before:");
+        System.out.println(getTeamTurn());
+        System.out.println("turn2");
+
+        //check if move is contained in valid moves
+        if (!(valid.contains(move)))
+        {
+            throw new InvalidMoveException("Move is invalid");
+        }
+
+        if (piece.getTeamColor() != this.getTeamTurn())
+        {
+            throw new InvalidMoveException("Not your turn!");
+        }
 
         if (move.getPromotionPiece() == null)
             this.board.addPiece(move.getEndPosition(), piece);
         else
             this.board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         this.board.addPiece(move.getStartPosition(), null);
+
+        //change team turn
+        if (getTeamTurn() == TeamColor.WHITE)
+        {
+            System.out.println("Change to black");
+            setTeamTurn(TeamColor.BLACK);
+        }
+        else if (getTeamTurn() == TeamColor.BLACK)
+        {
+            System.out.println("Change to white");
+            setTeamTurn(TeamColor.WHITE);
+        }
+        System.out.println("After: ");
+        System.out.println(getTeamTurn());
+        System.out.println("Turn");
+
     }
 
     /**
