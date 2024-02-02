@@ -14,6 +14,8 @@ public class ChessGame {
 
     public ChessGame() {
         this.color = TeamColor.WHITE;
+        this.board = new ChessBoard();
+        board.resetBoard();
     }
 
     /**
@@ -49,9 +51,11 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currentPiece = board.getPiece(startPosition);
-        if
 
-        return currentPiece.pieceMoves(board, startPosition);
+        if (currentPiece != null)
+            return currentPiece.pieceMoves(board, startPosition);
+        else
+            return null;
 
     }
 
@@ -62,7 +66,25 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (!(move.getStartPosition().getRow() > 0 && move.getStartPosition().getRow() <= 8 &&  move.getStartPosition().getColumn() > 0 && move.getStartPosition().getColumn() <= 8))
+        {
+            throw new InvalidMoveException("Bad start position");
+        }
+        if (!(move.getEndPosition().getRow() > 0 && move.getEndPosition().getRow() <= 8  && move.getEndPosition().getColumn() > 0 && move.getEndPosition().getColumn() <= 8))
+        {
+            throw new InvalidMoveException("Bad end position");
+        }
+        if (piece == null)
+        {
+            throw new InvalidMoveException("No piece at start position");
+        }
 
+        if (move.getPromotionPiece() == null)
+            this.board.addPiece(move.getEndPosition(), piece);
+        else
+            this.board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+        this.board.addPiece(move.getStartPosition(), null);
     }
 
     /**
