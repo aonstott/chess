@@ -235,7 +235,10 @@ public class ChessGame {
             Collection<ChessPosition> positions = getTeamPositions(teamColor);
             for (ChessPosition pos : positions)
             {
-
+                if (!validMoves(pos).isEmpty())
+                {
+                    return false;
+                }
             }
         }
         return true;
