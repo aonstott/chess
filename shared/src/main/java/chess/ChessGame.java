@@ -52,12 +52,31 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currentPiece = board.getPiece(startPosition);
+        ChessBoard ogBoard = board.clone();
 
-        if (currentPiece != null)
-            return currentPiece.pieceMoves(board, startPosition);
-        else
+        if (currentPiece == null)
             return null;
 
+        Collection<ChessMove> valid = new ArrayList<>();
+        Collection<ChessMove> possibleMoves = new ArrayList<>(currentPiece.pieceMoves(board, startPosition));
+        for (ChessMove mov : possibleMoves) {
+            ogBoard = board.clone();
+            testMove(mov);
+            if (!isInCheck(currentPiece.getTeamColor()))
+                valid.add(mov);
+            board = ogBoard;
+        }
+        return valid;
+    }
+
+    //makes whatever move you want, no error checking.  Only to test hypothetical moves.
+    public void testMove(ChessMove move) {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() == null)
+            this.board.addPiece(move.getEndPosition(), piece);
+        else
+            this.board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+        this.board.addPiece(move.getStartPosition(), null);
     }
 
     /**
@@ -69,32 +88,27 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
         Collection<ChessMove> valid = new ArrayList<>();
-        if (!(move.getStartPosition().getRow() > 0 && move.getStartPosition().getRow() <= 8 &&  move.getStartPosition().getColumn() > 0 && move.getStartPosition().getColumn() <= 8))
-        {
+        if (!(move.getStartPosition().getRow() > 0 && move.getStartPosition().getRow() <= 8 && move.getStartPosition().getColumn() > 0 && move.getStartPosition().getColumn() <= 8)) {
             throw new InvalidMoveException("Bad start position");
         }
-        if (!(move.getEndPosition().getRow() > 0 && move.getEndPosition().getRow() <= 8  && move.getEndPosition().getColumn() > 0 && move.getEndPosition().getColumn() <= 8))
-        {
+        if (!(move.getEndPosition().getRow() > 0 && move.getEndPosition().getRow() <= 8 && move.getEndPosition().getColumn() > 0 && move.getEndPosition().getColumn() <= 8)) {
             throw new InvalidMoveException("Bad end position");
         }
-        if (piece == null)
-        {
+        if (piece == null) {
             throw new InvalidMoveException("No piece at start position");
         }
-        valid = piece.pieceMoves(this.board, move.getStartPosition());
+        valid = validMoves(move.getStartPosition());
 
         //System.out.println("Before:");
         //System.out.println(getTeamTurn());
         //System.out.println("turn2");
 
         //check if move is contained in valid moves
-        if (!(valid.contains(move)))
-        {
+        if (!(valid.contains(move))) {
             throw new InvalidMoveException("Move is invalid");
         }
 
-        if (piece.getTeamColor() != this.getTeamTurn())
-        {
+        if (piece.getTeamColor() != this.getTeamTurn()) {
             throw new InvalidMoveException("Not your turn!");
         }
 
@@ -105,12 +119,9 @@ public class ChessGame {
         this.board.addPiece(move.getStartPosition(), null);
 
         //change team turn
-        if (getTeamTurn() == TeamColor.WHITE)
-        {
+        if (getTeamTurn() == TeamColor.WHITE) {
             setTeamTurn(TeamColor.BLACK);
-        }
-        else if (getTeamTurn() == TeamColor.BLACK)
-        {
+        } else if (getTeamTurn() == TeamColor.BLACK) {
             setTeamTurn(TeamColor.WHITE);
         }
         //System.out.println("After: ");
@@ -135,18 +146,16 @@ public class ChessGame {
         //System.out.println("KING POS: ");
         //System.out.println(kingPos);
         if (kingPos == null)
-                return false;
+            return false;
 
         Collection<ChessPosition> otherTeamPositions = getTeamPositions(otherTeamColor);
 
-        for (ChessPosition pos : otherTeamPositions)
-        {
-            Collection<ChessMove> moves = new ArrayList<>(validMoves(pos));
-            for (ChessMove mov : moves)
-            {
+        for (ChessPosition pos : otherTeamPositions) {
+            ChessPiece otherPiece = board.getPiece(pos);
+            Collection<ChessMove> moves = new ArrayList<>(otherPiece.pieceMoves(board, pos));
+            for (ChessMove mov : moves) {
 
-                if (mov.getEndPosition().equals(kingPos))
-                {
+                if (mov.getEndPosition().equals(kingPos)) {
                     return true;
                 }
             }
@@ -156,16 +165,12 @@ public class ChessGame {
 
     }
 
-    public Collection<ChessPosition> getTeamPositions(TeamColor color)
-    {
+    public Collection<ChessPosition> getTeamPositions(TeamColor color) {
         Collection<ChessPosition> positions = new ArrayList<>();
-        for (int i = 1; i < 9; i++)
-        {
-            for (int j = 1; j < 9; j++)
-            {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
-                if (piece != null)
-                {
+                if (piece != null) {
                     if (piece.getTeamColor() == color)
                         positions.add(new ChessPosition(i, j));
                 }
@@ -177,15 +182,11 @@ public class ChessGame {
     }
 
     //returns king for given team, null if it doesn't exist
-    public ChessPosition findKing(TeamColor color)
-    {
-        for (int i = 1; i < 9; i++)
-        {
-            for (int j = 1; j < 9; j++)
-            {
+    public ChessPosition findKing(TeamColor color) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
-                if (piece != null)
-                {
+                if (piece != null) {
                     if (piece.getTeamColor() == color && piece.getPieceType() == ChessPiece.PieceType.KING)
                         return new ChessPosition(i, j);
                 }
@@ -205,41 +206,17 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         if (getTeamTurn() != teamColor)
             return false;
-        ChessBoard ogBoard = getBoard().clone();
-        TeamColor otherColor;
-        if (teamColor == TeamColor.WHITE)
-            otherColor = TeamColor.BLACK;
-        else
-            otherColor = TeamColor.WHITE;
+
         if (!(isInCheck(teamColor)))
             return false;
         Collection<ChessPosition> teamPositions = new ArrayList<>(getTeamPositions(teamColor));
 
-        for (ChessPosition pos : teamPositions)
-        {
-            Collection<ChessMove> moves = new ArrayList<>(validMoves(pos));
-            for (ChessMove mov : moves)
-            {
-                ogBoard = board.clone();
-                try
-                {
-                    makeMove(mov);
-                    setTeamTurn(teamColor);
-                }
-                //i need this code for some reason but it won't throw an exception trust me
-                catch (InvalidMoveException swallooooow)
-                {
-                    System.out.println(swallooooow);
-                }
-                if (!(isInCheck(teamColor)))
-                {
-                    setBoard(ogBoard);
-                    return false;
-                }
-                setBoard(ogBoard);
+        for (ChessPosition pos : teamPositions) {
+            if (!validMoves(pos).isEmpty()) {
+                return false;
             }
+
         }
-        setBoard(ogBoard);
         return true;
     }
 
@@ -253,7 +230,15 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor))
             return false;
-        return false;
+        else
+        {
+            Collection<ChessPosition> positions = getTeamPositions(teamColor);
+            for (ChessPosition pos : positions)
+            {
+
+            }
+        }
+        return true;
     }
 
     /**
