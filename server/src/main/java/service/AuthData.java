@@ -6,10 +6,14 @@ import java.util.UUID;
 public class AuthData {
     private final String authToken;
 
-    AuthData()
+    public AuthData()
     {
         this.authToken = UUID.randomUUID().toString();
 
+    }
+
+    public String getAuthToken() {
+        return authToken;
     }
 
     @Override

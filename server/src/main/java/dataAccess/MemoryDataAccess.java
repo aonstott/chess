@@ -1,36 +1,59 @@
 package dataAccess;
 
 import chess.ChessGame;
+import org.eclipse.jetty.server.Authentication;
 import service.AuthData;
 import service.GameData;
 import service.UserData;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 public class MemoryDataAccess implements DataAccess{
-    private ArrayList<UserData> users = new ArrayList<>();
-    private ArrayList<AuthData> auth = new ArrayList<>();
-    private ArrayList<GameData> games = new ArrayList<>();
+    private final HashSet<UserData> users = new HashSet<>();
+    private final HashMap<AuthData, String> auth = new HashMap<>();
+    private final HashSet<GameData> games = new HashSet<>();
 
+    //getUser() finds UserData for a given username
     public UserData getUser(String username)
     {
+        for (UserData user : users)
+        {
+            if (Objects.equals(user.username(), username))
+            {
+                return user;
+            }
+        }
+        //return null if not found
         return null;
     }
 
-    public void createUser(String username, String password)
+    public void createUser(UserData user)
     {
-
+        //add user to data structure
+        users.add(user);
     }
 
     public AuthData createAuth(String username)
     {
-        return null;
+        AuthData newAuth = new AuthData();
+        auth.put(newAuth, username);
+        return newAuth;
     }
 
-    public void deleteAuth(String username)
+    public String getAuth(AuthData info)
     {
+        return auth.get(info);
+    }
 
+    //removes authToken for a user
+    public void deleteAuth(AuthData info)
+    {
+        auth.remove(info);
+    }
+
+    public boolean authExists(AuthData authRequest)
+    {
+        return auth.containsKey(authRequest);
     }
 
     public Collection<GameData> listGames()

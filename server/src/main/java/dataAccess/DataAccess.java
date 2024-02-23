@@ -10,11 +10,11 @@ import java.util.Collection;
 public interface DataAccess {
     public UserData getUser(String username);
 
-    public void createUser(String username, String password);
+    public void createUser(UserData user);
 
     public AuthData createAuth(String username);
 
-    public void deleteAuth(String username);
+    public void deleteAuth(AuthData info);
 
     public Collection<GameData> listGames();
 
@@ -25,4 +25,5 @@ public interface DataAccess {
     public void updateGame(int gameID, ChessGame.TeamColor clientColor);
 
     public void clear();
+    public boolean authExists(AuthData authRequest);
 }
