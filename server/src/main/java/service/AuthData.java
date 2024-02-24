@@ -4,16 +4,21 @@ import java.util.UUID;
 
 
 public class AuthData {
-    private final String authToken;
+    private final String authorization;
 
     public AuthData()
     {
-        this.authToken = UUID.randomUUID().toString();
+        this.authorization = UUID.randomUUID().toString();
 
     }
 
+    public AuthData(String authorization)
+    {
+        this.authorization = authorization;
+    }
+
     public String getAuthToken() {
-        return authToken;
+        return authorization;
     }
 
     @Override
@@ -21,18 +26,18 @@ public class AuthData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AuthData authData = (AuthData) o;
-        return Objects.equals(authToken, authData.authToken);
+        return Objects.equals(authorization, authData.authorization);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authToken);
+        return Objects.hash(authorization);
     }
 
     @Override
     public String toString() {
         return "AuthData{" +
-                "authToken='" + authToken + '\'' +
+                "authToken='" + authorization + '\'' +
                 '}';
     }
 }

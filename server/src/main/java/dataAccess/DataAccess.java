@@ -20,7 +20,7 @@ public interface DataAccess {
 
     public GameData getGame(int gameID);
 
-    public void createGame(String gameName);
+    public int createGame(String gameName);
 
     public void updateGame(int gameID, ChessGame.TeamColor clientColor);
 

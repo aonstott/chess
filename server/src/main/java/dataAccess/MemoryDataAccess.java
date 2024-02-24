@@ -12,6 +12,7 @@ public class MemoryDataAccess implements DataAccess{
     private final HashSet<UserData> users = new HashSet<>();
     private final HashMap<AuthData, String> auth = new HashMap<>();
     private final HashSet<GameData> games = new HashSet<>();
+    private int nextID = 0;
 
     //getUser() finds UserData for a given username
     public UserData getUser(String username)
@@ -58,7 +59,7 @@ public class MemoryDataAccess implements DataAccess{
 
     public Collection<GameData> listGames()
     {
-        return null;
+        return games;
     }
 
     public GameData getGame(int gameID)
@@ -66,9 +67,11 @@ public class MemoryDataAccess implements DataAccess{
         return null;
     }
 
-    public void createGame(String gameName)
+    public int createGame(String gameName)
     {
-
+        games.add(new GameData(gameName, nextID, null, null));
+        nextID++;
+        return nextID - 1;
     }
 
     public void updateGame(int gameID, ChessGame.TeamColor clientColor)
