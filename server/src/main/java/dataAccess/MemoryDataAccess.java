@@ -82,5 +82,21 @@ public class MemoryDataAccess implements DataAccess {
         auth.clear();
     }
 
+    //for the tests
+    public HashSet<UserData> getUsers()
+    {
+        return users;
+    }
+
+    public HashMap<AuthData, String> getAuths()
+    {
+        return auth;
+    }
+
+    public Collection<GameData> getGames()
+    {
+        return games;
+    }
+
 
 }

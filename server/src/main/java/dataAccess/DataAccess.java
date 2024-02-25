@@ -25,4 +25,5 @@ public interface DataAccess {
 
     void clear();
     boolean authExists(AuthData authRequest);
+
 }

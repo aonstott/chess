@@ -57,7 +57,6 @@ public class UserService {
         }
         else
         {
-            System.out.println("logout failed");
             throw new UnauthorizedException(401, "Unauthorized");
         }
     }

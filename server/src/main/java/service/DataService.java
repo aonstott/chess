@@ -19,7 +19,4 @@ public class DataService {
     {
         dataAccess.clear();
     }
-    public boolean checkAuth(AuthData auth) {
-        return dataAccess.authExists(auth);
-    }
 }
