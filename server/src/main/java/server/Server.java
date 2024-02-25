@@ -2,7 +2,7 @@ package server;
 import com.google.gson.Gson;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
-import Exception.ResponseException;
+import Exception.*;
 import org.eclipse.jetty.server.Authentication;
 import service.*;
 import spark.*;
@@ -68,21 +68,49 @@ public class Server {
 
     private Object register(Request req, Response res)
     {
-        var user = new Gson().fromJson(req.body(), UserData.class);
-        AuthData auth = userService.register(user);
-        LoginResult result = new LoginResult(user.username(), auth.getAuthToken());
-        res.status(200);
-        return new Gson().toJson(result);
+        try {
+            var user = new Gson().fromJson(req.body(), UserData.class);
+            AuthData auth = userService.register(user);
+            LoginResult result = new LoginResult(user.username(), auth.getAuthToken());
+            res.status(200);
+            return new Gson().toJson(result);
+        } catch (RegisterException e) {
+            res.status(e.StatusCode());
+            return "{ \"message\": \"Error: already taken\" }";
+        }
+        catch (BadRequest e)
+        {
+            res.status(e.StatusCode());
+            return "{ \"message\": \"Error: bad request\" }";
+        }
+        catch (ResponseException e)
+        {
+            res.status(500);
+            return "{ \"message\": \"Error: unknown\" }";
+        }
     }
 
     private Object login(Request req, Response res)
     {
         var info = new Gson().fromJson(req.body(), LoginRequest.class);
-        AuthData auth = userService.login(info);
-        LoginResult result = new LoginResult(info.username(), auth.getAuthToken());
-        res.status(200);
-        return new Gson().toJson(result);
-
+        try {
+            AuthData auth = userService.login(info);
+            LoginResult result = new LoginResult(info.username(), auth.getAuthToken());
+            res.status(200);
+            System.out.println("yay");
+            return new Gson().toJson(result);
+        }
+        catch (loginFailed e)
+        {
+            System.out.println(e.getMessage());
+            res.status(e.StatusCode());
+            System.out.println("noo");
+            return "{ \"message\": \"Error: unauthorized\" }";
+        }
+        catch (ResponseException e) {
+            res.status(500);
+            return "{ \"message\": \"Error: unknown\" }";
+        }
     }
 
     private Object logout(Request req, Response res)
@@ -90,17 +118,21 @@ public class Server {
         //var info = new Gson().fromJson(req.headers("authorization"), AuthData.class);
         AuthData info = new AuthData(req.headers("authorization"));
         System.out.println(info);
-        if (userService.logout(info))
+        try
         {
-            System.out.println("Success");
+            userService.logout(info);
             res.status(200);
             return "{}";
         }
-        else
+        catch (UnauthorizedException e)
         {
-            System.out.println("Failure");
-            res.status(401);
+            res.status(e.StatusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
+        }
+        catch (ResponseException e)
+        {
+            res.status(500);
+            return "{ \"message\": \"Error: unknown\" }";
         }
     }
 
@@ -108,33 +140,49 @@ public class Server {
     {
         AuthData authorization = new AuthData(req.headers("authorization"));
         var info = new Gson().fromJson(req.body(), CreateGameRequest.class);
-        if (gameService.checkAuth(authorization))
+        try
         {
-            int gameID = gameService.createGame(info.gameName());
+            int gameID = gameService.createGame(info.gameName(), authorization);
             CreateGameResponse response = new CreateGameResponse(gameID);
             res.status(200);
             return new Gson().toJson(response);
         }
-        else
+        catch (UnauthorizedException e)
         {
-            res.status(401);
+            res.status(e.StatusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
+        }
+        catch (BadRequest e)
+        {
+            res.status(e.StatusCode());
+            return "{ \"message\": \"Error: bad request\" }";
+
+        }
+        catch (ResponseException e)
+        {
+            res.status(500);
+            return "{ \"message\": \"Error: unknown\" }";
         }
     }
 
     private Object listGames(Request req, Response res)
     {
         AuthData authorization = new AuthData(req.headers("authorization"));
-        if (gameService.checkAuth(authorization))
+        try
         {
             res.status(200);
-            Collection<GameData> gamesList = gameService.listGames();
+            Collection<GameData> gamesList = gameService.listGames(authorization);
             return new Gson().toJson(gamesList);
         }
-        else
+        catch (UnauthorizedException e)
         {
-            res.status(401);
+            res.status(e.StatusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
+        }
+        catch (ResponseException e)
+        {
+            res.status(500);
+            return "{ \"message\": \"Error: unknown\" }";
         }
     }
 
