@@ -34,7 +34,6 @@ public class UserService {
     public AuthData login(LoginRequest info) throws ResponseException {
         if (dao.getUser(info.username()) == null)
         {
-            System.out.println("unauthorizeeeed");
             throw new loginFailed(401, "Error: unauthorized");
         }
         if (Objects.equals(info.password(), dao.getUser(info.username()).password()))
@@ -45,7 +44,6 @@ public class UserService {
         }
         else
         {
-            System.out.println("Wrong pswd");
             throw new loginFailed(401, "Wrong password");
         }
     }
@@ -57,7 +55,10 @@ public class UserService {
             dao.deleteAuth(info);
         }
         else
+        {
+            System.out.println("logout failed");
             throw new UnauthorizedException(401, "Unauthorized");
+        }
     }
 
 }

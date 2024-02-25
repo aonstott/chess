@@ -43,6 +43,7 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::createGame);
         Spark.get("/game", this::listGames);
+        Spark.put("/game", this::updateGame);
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
 
@@ -61,9 +62,16 @@ public class Server {
 
     private Object clear(Request req, Response res) throws ResponseException
     {
-        dataService.clearAll();
-        res.status(200);
-        return "{}";
+        try {
+            dataService.clearAll();
+            res.status(200);
+            return "{}";
+        }
+        catch (ResponseException e)
+        {
+            res.status(500);
+            return "{ \"message\": \"Error: unknown\" }";
+        }
     }
 
     private Object register(Request req, Response res)
@@ -97,14 +105,12 @@ public class Server {
             AuthData auth = userService.login(info);
             LoginResult result = new LoginResult(info.username(), auth.getAuthToken());
             res.status(200);
-            System.out.println("yay");
             return new Gson().toJson(result);
         }
         catch (loginFailed e)
         {
             System.out.println(e.getMessage());
             res.status(e.StatusCode());
-            System.out.println("noo");
             return "{ \"message\": \"Error: unauthorized\" }";
         }
         catch (ResponseException e) {
@@ -136,7 +142,7 @@ public class Server {
         }
     }
 
-    private Object createGame(Request req, Response res) throws ResponseException
+    private Object createGame(Request req, Response res)
     {
         AuthData authorization = new AuthData(req.headers("authorization"));
         var info = new Gson().fromJson(req.body(), CreateGameRequest.class);
@@ -172,12 +178,48 @@ public class Server {
         {
             res.status(200);
             Collection<GameData> gamesList = gameService.listGames(authorization);
-            return new Gson().toJson(gamesList);
+            String ret = new Gson().toJson(gamesList);
+            ret = "{ \"games\": " + ret + "}";
+            return ret;
         }
         catch (UnauthorizedException e)
         {
             res.status(e.StatusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
+        }
+        catch (ResponseException e)
+        {
+            res.status(500);
+            return "{ \"message\": \"Error: unknown\" }";
+        }
+    }
+
+    private Object updateGame(Request req, Response res)
+    {
+        AuthData authorization = new AuthData(req.headers("authorization"));
+        var requestInfo = new Gson().fromJson(req.body(), UpdateGameRequest.class);
+        try
+        {
+            gameService.updateGame(requestInfo.gameID(), requestInfo.playerColor(), authorization);
+            res.status(200);
+            return "{}";
+        }
+        catch (UnauthorizedException e)
+        {
+            res.status(e.StatusCode());
+            return "{ \"message\": \"Error: unauthorized\" }";
+        }
+        catch (BadRequest e)
+        {
+            res.status(e.StatusCode());
+            return "{ \"message\": \"Error: bad request\" }";
+
+        }
+        catch (AlreadyTakenException e)
+        {
+            res.status(e.StatusCode());
+            return "{ \"message\": \"Error: already taken\" }";
+
         }
         catch (ResponseException e)
         {

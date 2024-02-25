@@ -22,7 +22,7 @@ public interface DataAccess {
 
     public int createGame(String gameName);
 
-    public void updateGame(int gameID, ChessGame.TeamColor clientColor);
+    public void updateGame(int gameID, String clientColor, AuthData authData);
 
     public void clear();
     public boolean authExists(AuthData authRequest);

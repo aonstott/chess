@@ -1,7 +1,7 @@
 package service;
 
 import dataAccess.DataAccess;
-import Exception.ResponseException;
+import Exception.*;
 import dataAccess.MemoryDataAccess;
 import spark.Response;
 
@@ -18,5 +18,8 @@ public class DataService {
     public void clearAll() throws ResponseException
     {
         dataAccess.clear();
+    }
+    public boolean checkAuth(AuthData auth) {
+        return dataAccess.authExists(auth);
     }
 }
