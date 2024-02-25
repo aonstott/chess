@@ -3,13 +3,11 @@ import com.google.gson.Gson;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
 import Exception.*;
-import org.eclipse.jetty.server.Authentication;
 import service.*;
+import service.reqres.*;
 import spark.*;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
-import java.util.HashSet;
 
 public class Server {
 
@@ -57,10 +55,10 @@ public class Server {
     }
 
     private void exceptionHandler(ResponseException ex, Request req, Response res) {
-        res.status(ex.StatusCode());
+        res.status(ex.statusCode());
     }
 
-    private Object clear(Request req, Response res) throws ResponseException
+    private Object clear(Request req, Response res)
     {
         try {
             dataService.clearAll();
@@ -83,12 +81,12 @@ public class Server {
             res.status(200);
             return new Gson().toJson(result);
         } catch (RegisterException e) {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: already taken\" }";
         }
         catch (BadRequest e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: bad request\" }";
         }
         catch (ResponseException e)
@@ -107,10 +105,10 @@ public class Server {
             res.status(200);
             return new Gson().toJson(result);
         }
-        catch (loginFailed e)
+        catch (LoginFailed e)
         {
             System.out.println(e.getMessage());
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
         }
         catch (ResponseException e) {
@@ -132,7 +130,7 @@ public class Server {
         }
         catch (UnauthorizedException e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
         }
         catch (ResponseException e)
@@ -155,12 +153,12 @@ public class Server {
         }
         catch (UnauthorizedException e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
         }
         catch (BadRequest e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: bad request\" }";
 
         }
@@ -184,7 +182,7 @@ public class Server {
         }
         catch (UnauthorizedException e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
         }
         catch (ResponseException e)
@@ -206,18 +204,18 @@ public class Server {
         }
         catch (UnauthorizedException e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: unauthorized\" }";
         }
         catch (BadRequest e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: bad request\" }";
 
         }
         catch (AlreadyTakenException e)
         {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return "{ \"message\": \"Error: already taken\" }";
 
         }

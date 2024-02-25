@@ -4,6 +4,7 @@ import dataAccess.DataAccess;
 
 import java.util.Objects;
 import Exception.*;
+import service.reqres.LoginRequest;
 
 public class UserService {
 
@@ -34,7 +35,7 @@ public class UserService {
     public AuthData login(LoginRequest info) throws ResponseException {
         if (dao.getUser(info.username()) == null)
         {
-            throw new loginFailed(401, "Error: unauthorized");
+            throw new LoginFailed(401, "Error: unauthorized");
         }
         if (Objects.equals(info.password(), dao.getUser(info.username()).password()))
         {
@@ -44,7 +45,7 @@ public class UserService {
         }
         else
         {
-            throw new loginFailed(401, "Wrong password");
+            throw new LoginFailed(401, "Wrong password");
         }
     }
 

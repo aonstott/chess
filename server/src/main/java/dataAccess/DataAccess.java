@@ -1,6 +1,5 @@
 package dataAccess;
 
-import chess.ChessGame;
 import service.AuthData;
 import service.GameData;
 import service.UserData;
@@ -8,22 +7,22 @@ import service.UserData;
 import java.util.Collection;
 
 public interface DataAccess {
-    public UserData getUser(String username);
+    UserData getUser(String username);
 
-    public void createUser(UserData user);
+    void createUser(UserData user);
 
-    public AuthData createAuth(String username);
+    AuthData createAuth(String username);
 
-    public void deleteAuth(AuthData info);
+    void deleteAuth(AuthData info);
 
-    public Collection<GameData> listGames();
+    Collection<GameData> listGames();
 
-    public GameData getGame(int gameID);
+    GameData getGame(int gameID);
 
-    public int createGame(String gameName);
+    int createGame(String gameName);
 
-    public void updateGame(int gameID, String clientColor, AuthData authData);
+    void updateGame(int gameID, String clientColor, AuthData authData);
 
-    public void clear();
-    public boolean authExists(AuthData authRequest);
+    void clear();
+    boolean authExists(AuthData authRequest);
 }

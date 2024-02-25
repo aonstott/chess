@@ -1,4 +1,4 @@
-package service;
+package service.reqres;
 
 public record CreateGameRequest(String gameName) {
 }

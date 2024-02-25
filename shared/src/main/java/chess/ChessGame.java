@@ -99,10 +99,6 @@ public class ChessGame {
         }
         valid = validMoves(move.getStartPosition());
 
-        //System.out.println("Before:");
-        //System.out.println(getTeamTurn());
-        //System.out.println("turn2");
-
         //check if move is contained in valid moves
         if (!(valid.contains(move))) {
             throw new InvalidMoveException("Move is invalid");
@@ -124,9 +120,6 @@ public class ChessGame {
         } else if (getTeamTurn() == TeamColor.BLACK) {
             setTeamTurn(TeamColor.WHITE);
         }
-        //System.out.println("After: ");
-        //System.out.println(getTeamTurn());
-        //System.out.println("Turn");
 
     }
 
@@ -143,8 +136,7 @@ public class ChessGame {
         else
             otherTeamColor = TeamColor.WHITE;
         ChessPosition kingPos = findKing(teamColor);
-        //System.out.println("KING POS: ");
-        //System.out.println(kingPos);
+
         if (kingPos == null)
             return false;
 

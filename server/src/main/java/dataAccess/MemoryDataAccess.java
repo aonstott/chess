@@ -35,9 +35,6 @@ public class MemoryDataAccess implements DataAccess {
         return newAuth;
     }
 
-    public String getAuth(AuthData info) {
-        return auth.get(info);
-    }
 
     //removes authToken for a user
     public void deleteAuth(AuthData info) {

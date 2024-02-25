@@ -1,4 +1,6 @@
-package service;
+package service.reqres;
+
+import service.GameData;
 
 import java.util.Collection;
 

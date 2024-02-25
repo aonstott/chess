@@ -285,7 +285,7 @@ public class ChessPiece implements Cloneable{
 
     //this is a stupid name but oh well
     //0 is nothing, 1 add, 2 subtract
-    private Collection<ChessMove> getMovesLoop(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor, int row_op, int col_op) {
+    private Collection<ChessMove> getMovesLoop(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor, int rowOp, int colOp) {
         Collection<ChessMove> moves = new ArrayList<>();
 
         //save it again for backwards moves (this seems inefficient but oh well)
@@ -294,20 +294,20 @@ public class ChessPiece implements Cloneable{
 
         //get forward diagonal moves
         while (isValidPosition(currentRow2, currentCol2)) {
-            if (row_op == 1)
+            if (rowOp == 1)
                 currentRow2++;
-            if (row_op == 2)
+            if (rowOp == 2)
                 currentRow2--;
-            if (col_op == 1)
+            if (colOp == 1)
                 currentCol2++;
-            if (col_op == 2)
+            if (colOp == 2)
                 currentCol2--;
 
-            if (col_op > 2 || col_op < 0) {
-                throw new RuntimeException("col_op is not in acceptable range");
+            if (colOp > 2 || colOp < 0) {
+                throw new RuntimeException("colOp is not in acceptable range");
             }
-            if (row_op > 2 || row_op < 0) {
-                throw new RuntimeException("row_op is not in acceptable range");
+            if (rowOp > 2 || rowOp < 0) {
+                throw new RuntimeException("rowOp is not in acceptable range");
             }
 
             if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null) {

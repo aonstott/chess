@@ -43,14 +43,6 @@ public class ChessMove {
         return promotionPiece;
     }
 
-    public String toStr()
-    {
-        String str = "";
-        str += ("[" + startPosition.toString() + "]");
-        str += " to ";
-        str += ("[" + endPosition.toString() + "]\n");
-        return str;
-    }
 
     @Override
     public boolean equals(Object obj) {
