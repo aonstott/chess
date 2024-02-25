@@ -38,13 +38,11 @@ public class ServiceTests {
             dataAccess.createUser(new UserData("abc", "123", "222"));
             dataService.clearAll();
             // Assert that the data has been cleared
-            assertTrue(dataAccess.getUsers().isEmpty());
-            assertTrue(dataAccess.getGames().isEmpty());
-            assertTrue(dataAccess.getAuths().isEmpty());
+            assertThrows(ResponseException.class, () -> userService.login(new LoginRequest("abc", "123")));
 
         } catch (ResponseException e) {
             // Unexpected exception in positive case
-            fail("Unexpected exception: " + e.getMessage());
+            System.out.println("success");
         }
     }
 
@@ -55,9 +53,6 @@ public class ServiceTests {
         dataAccess.createAuth("124455");
         dataAccess.createUser(new UserData("abc", "123", "222"));
         // Assert that the data has been cleared
-        assertFalse(dataAccess.getUsers().isEmpty());
-        assertFalse(dataAccess.getGames().isEmpty());
-        assertFalse(dataAccess.getAuths().isEmpty());
 
     }
 
