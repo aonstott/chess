@@ -27,6 +27,7 @@ public class ServiceTests {
         dataService = new DataService(dataAccess);
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
+        dataAccess.clear();
     }
 
     @Test
