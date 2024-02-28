@@ -170,95 +170,14 @@ public class ChessPiece implements Cloneable{
 
 
         Collection<ChessMove> bishopMoves = new ArrayList<>();
-        //starting position
-        int currentRow = position.getRow();
-        int currentCol = position.getColumn();
-        //save it again for backwards moves (this seems inefficient but oh well)
-        int currentRow2 = position.getRow();
-        int currentCol2 = position.getColumn();
-
-        //get forward diagonal moves
-        while (isValidPosition(currentRow2, currentCol2)) {
-            currentRow2++;
-            currentCol2++;
-
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null) {
-                //same color?
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
-                    bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-                //don't add anymore because we are blocked
-                break;
-            }
-
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) == null) {
-                bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-            }
-
-        }
-
-        currentCol2 = currentCol;
-        currentRow2 = currentRow;
-
-        //backwards diagonal moves
-        while (isValidPosition(currentRow2, currentCol2)) {
-            currentRow2--;
-            currentCol2++;
-
-            //found a piece at this spot, could capture??
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null) {
-                //same color?
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
-                    bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-                //don't add anymore because we are blocked
-                break;
-            }
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) == null) {
-                bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-            }
-        }
-
-        currentCol2 = currentCol;
-        currentRow2 = currentRow;
+        bishopMoves.addAll(getMovesLoop(board, position, teamColor, 1, 1));
+        bishopMoves.addAll(getMovesLoop(board, position, teamColor, 1, 2));
+        bishopMoves.addAll(getMovesLoop(board, position, teamColor, 2, 2));
+        bishopMoves.addAll(getMovesLoop(board, position, teamColor, 2, 1));
 
 
-        //backwards diagonal moves
-        while (isValidPosition(currentRow2, currentCol2)) {
-            currentRow2--;
-            currentCol2--;
 
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null) {
-                //cant capture same color
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
-                    bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-                //don't add anymore because we are blocked
-                break;
-            }
 
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) == null) {
-                bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-            }
-        }
-
-        currentCol2 = currentCol;
-        currentRow2 = currentRow;
-
-        //backwards diagonal moves
-        while (isValidPosition(currentRow2, currentCol2)) {
-            currentRow2++;
-            currentCol2--;
-
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) != null) {
-                //same color??
-                if (board.getPiece(new ChessPosition(currentRow2, currentCol2)).getTeamColor() != teamColor)
-                    bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-                //don't add anymore because we are blocked
-                break;
-            }
-
-            if (isValidPosition(currentRow2, currentCol2) && board.getPiece(new ChessPosition(currentRow2, currentCol2)) == null) {
-                bishopMoves.add(new ChessMove(position, new ChessPosition(currentRow2, currentCol2), null));
-            }
-        }
 
         return bishopMoves;
     }
