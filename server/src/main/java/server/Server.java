@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
 import Exception.*;
+import dataAccess.SqlDataAccess;
 import service.*;
 import service.reqres.*;
 import spark.*;
@@ -24,10 +25,12 @@ public class Server {
 
     public Server()
     {
-        this.dataService = new DataService(new MemoryDataAccess());
-        this.userService = new UserService(new MemoryDataAccess());
-        this.gameService = new GameService(new MemoryDataAccess());
+        SqlDataAccess sql = new SqlDataAccess();
+        this.dataService = new DataService(sql);
+        this.userService = new UserService(sql);
+        this.gameService = new GameService(sql);
     }
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -227,6 +230,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        new Server(new MemoryDataAccess()).run(8080);
+        new Server(new SqlDataAccess()).run(8080);
     }
 }
