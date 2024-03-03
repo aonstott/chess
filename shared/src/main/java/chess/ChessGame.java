@@ -1,5 +1,7 @@
 package chess;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -252,5 +254,10 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    public String toString()
+    {
+        return new Gson().toJson(this);
     }
 }
