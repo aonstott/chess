@@ -1,5 +1,5 @@
-import dataAccess.DataAccess;
-import dataAccess.MemoryDataAccess;
+package dataAccessTests;
+
 import dataAccess.SqlDataAccess;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +11,7 @@ import service.reqres.LoginRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class dataAccessTests {
+public class DataAccessTests {
     private SqlDataAccess dataAccess;
     private DataService dataService;
     private UserService userService;
