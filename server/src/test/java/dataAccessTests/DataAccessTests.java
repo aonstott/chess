@@ -159,9 +159,9 @@ public class DataAccessTests {
     {
         try {
             AuthData auth = userService.register(user1);
-            assertThrows(ResponseException.class, () -> gameService.createGame("Bad Request", auth));
+            assertThrows(ResponseException.class, () -> gameService.createGame("", auth));
         } catch (ResponseException e) {
-            assertEquals("Unauthorized", e.getMessage());
+            assertEquals("Bad Request", e.getMessage());
         }
     }
 
@@ -217,7 +217,7 @@ public class DataAccessTests {
         try {
             AuthData auth = userService.register(user1);
             int id = gameService.createGame("gameeee", auth);
-            assertThrows(ResponseException.class, () -> gameService.updateGame(id, "", auth));
+            assertThrows(ResponseException.class, () -> gameService.updateGame(id, "white", auth));
         } catch (ResponseException e) {
             assertEquals("Bad clientColor request", e.getMessage());
         }
