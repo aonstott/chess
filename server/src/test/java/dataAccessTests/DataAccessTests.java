@@ -155,6 +155,17 @@ public class DataAccessTests {
     }
 
     @Test
+    public void testCreateGameBad2()
+    {
+        try {
+            AuthData auth = userService.register(user1);
+            assertThrows(ResponseException.class, () -> gameService.createGame("Bad Request", auth));
+        } catch (ResponseException e) {
+            assertEquals("Unauthorized", e.getMessage());
+        }
+    }
+
+    @Test
     public void testListGameGood()
     {
         try {
@@ -197,6 +208,30 @@ public class DataAccessTests {
             assertThrows(ResponseException.class, () -> gameService.updateGame(id, "icantdecide", auth));
         } catch (ResponseException e) {
             assertEquals("Bad clientColor request", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUpdateGameBad2()
+    {
+        try {
+            AuthData auth = userService.register(user1);
+            int id = gameService.createGame("gameeee", auth);
+            assertThrows(ResponseException.class, () -> gameService.updateGame(id, "", auth));
+        } catch (ResponseException e) {
+            assertEquals("Bad clientColor request", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUpdateGameBad3()
+    {
+        try {
+            AuthData auth = userService.register(user1);
+            int id = gameService.createGame("gameeee", auth);
+            assertThrows(ResponseException.class, () -> gameService.updateGame(id, "WHITE", new AuthData("invalid")));
+        } catch (ResponseException e) {
+            assertEquals("Unauthorized", e.getMessage());
         }
     }
 }
