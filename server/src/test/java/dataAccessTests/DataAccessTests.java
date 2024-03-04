@@ -65,6 +65,61 @@ public class DataAccessTests {
     }
 
     @Test
+    public void testGetUser() {
+        try
+        {
+            userService.register(user1);
+            UserData testUser = dataAccess.getUser("abc");
+            assertEquals(user1, testUser);
+        }
+        catch (ResponseException e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetUserBad() {
+        try
+        {
+            userService.register(user1);
+            UserData testUser = dataAccess.getUser("doesnotexist");
+            assertNull(testUser);
+        }
+        catch (ResponseException e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateUser() {
+        dataAccess.createUser(user1);
+        UserData testUser = dataAccess.getUser("abc");
+        assertEquals(user1, testUser);
+    }
+
+    @Test
+    public void testCreateUserBad() {
+        dataAccess.createUser(user1);
+        UserData testUser = dataAccess.getUser("notauser");
+        assertNull(testUser);
+    }
+
+    @Test
+    public void testGetGame() {
+        dataAccess.createGame("game1");
+        GameData game = dataAccess.getGame(1);
+        GameData game2 = new GameData("game1", 1, null, null);
+    }
+
+    @Test
+    public void testGetGameBad() {
+        dataAccess.createGame("game1");
+        GameData game = dataAccess.getGame(2);
+        assertNull(game);
+    }
+
+
+    @Test
     public void testRegisterFails() {
         try {
             // First registration attempt
