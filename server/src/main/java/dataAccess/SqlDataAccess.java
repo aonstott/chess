@@ -1,9 +1,14 @@
 package dataAccess;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Objects;
 
 import Exception.*;
 import chess.ChessGame;
+import com.google.gson.Gson;
+import org.eclipse.jetty.server.Authentication;
 import service.AuthData;
 import service.GameData;
 import service.UserData;
@@ -39,15 +44,35 @@ public class SqlDataAccess implements DataAccess {
 
     public UserData getUser(String username)
     {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM users WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getUser");
+            System.out.println(e.getMessage());
+        }
         return null;
+    }
+
+    private UserData readUser(ResultSet rs) throws SQLException {
+        var json = rs.getString("json");
+        return new Gson().fromJson(json, UserData.class);
     }
 
     public void createUser(UserData user)
     {
-        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
         try {
-            executeUpdate(statement, user.username(), user.password(), user.email());
+            executeUpdate(statement, user.username(), user.password(), user.email(), new Gson().toJson(user));
         } catch (ResponseException e) {
+            System.out.println("createUser");
             System.out.println(e.getMessage());
         }
     }
@@ -67,27 +92,126 @@ public class SqlDataAccess implements DataAccess {
 
     public void deleteAuth(AuthData info)
     {
-
+        var statement = "DELETE FROM auth WHERE auth=?";
+        try {
+            executeUpdate(statement, info.toString());
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public Collection<GameData> listGames()
     {
+        Collection<GameData> gamesList = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT json FROM games";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        gamesList.add(new Gson().fromJson(rs.getString("json"), GameData.class));
+                    }
+                    return gamesList;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getUser");
+            System.out.println(e.getMessage());
+        }
         return null;
     }
 
     public GameData getGame(int gameID)
     {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM games WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readGame(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getUser");
+            System.out.println(e.getMessage());
+        }
         return null;
     }
+    private GameData readGame(ResultSet rs) throws SQLException {
+        var json = rs.getString("json");
+        return new Gson().fromJson(json, GameData.class);
+    }
+
 
     public int createGame(String gameName)
     {
+        var statement = "INSERT INTO games (name) VALUES (?)";
+        try {
+            int id = executeUpdate(statement, gameName);
+            var statement2 = "UPDATE games SET json = ? WHERE id = ?";
+            GameData game = new GameData(gameName, id, null, null);
+            executeUpdate(statement2, new Gson().toJson(game), id);
+            return id;
+        } catch (ResponseException e) {
+            System.out.println("createUser");
+            System.out.println(e.getMessage());
+        }
         return 0;
     }
 
     public void updateGame(int gameID, String clientColor, AuthData authData)
     {
+        try {
+            GameData game = getGame(gameID);
+            String username = getUsername(authData);
+            System.out.println("Updating");
+            var statement = "SELECT username FROM auth WHERE auth=?";
+            System.out.println("here");
+            System.out.println(username);
+            var statement2 = "";
+            if (Objects.equals(clientColor, "WHITE"))
+            {
+                game.setWhiteUsername(username);
+                statement2 = "UPDATE games SET whiteUsername = ?, json = ? WHERE id = ?";
+            }
+            else if (Objects.equals(clientColor, "BLACK"))
+            {
+                game.setBlackUsername(username);
+                statement2 = "UPDATE games SET blackUsername = ?, json = ? WHERE id = ?";
+            }
+            try
+            {
+                executeUpdate(statement2, username, new Gson().toJson(game), gameID);
+            }
+            catch (ResponseException e)
+            {
+                System.out.println(e.getMessage());
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
+    private static String getUsername(AuthData authData) throws SQLException {
+        String username = "";
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username FROM auth WHERE auth=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authData.getAuthToken());
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next())
+                    {
+                        username = rs.getString("username");
+                    }
+                }
+            }
+        }
+        catch (ResponseException e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return username;
     }
 
     public void clear()
@@ -105,8 +229,24 @@ public class SqlDataAccess implements DataAccess {
     }
     public boolean authExists(AuthData authRequest)
     {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM auth WHERE auth=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authRequest.getAuthToken());
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("authExists");
+            System.out.println(e.getMessage());
+        }
         return false;
     }
+
+
 
     private int executeUpdate(String statement, Object... params) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -137,12 +277,11 @@ public class SqlDataAccess implements DataAccess {
             CREATE TABLE IF NOT EXISTS  games (
               `id` int NOT NULL AUTO_INCREMENT,
               `name` varchar(256) NOT NULL,
-              `whiteUsername` varchar(256) NOT NULL,
-              `blackUsername` varchar(256) NOT NULL,
+              `whiteUsername` varchar(256),
+              `blackUsername` varchar(256),
               `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`),
-              INDEX(id),
-              INDEX(name)
+              INDEX(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """,
             """

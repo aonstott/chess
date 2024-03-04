@@ -212,6 +212,7 @@ public class Server {
         }
         catch (BadRequest e)
         {
+            System.out.println(e.getMessage());
             res.status(e.statusCode());
             return "{ \"message\": \"Error: bad request\" }";
 
