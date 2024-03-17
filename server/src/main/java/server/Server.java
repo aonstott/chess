@@ -1,11 +1,10 @@
 package server;
 import com.google.gson.Gson;
 import dataAccess.DataAccess;
-import dataAccess.MemoryDataAccess;
 import Exception.*;
 import dataAccess.SqlDataAccess;
+import reqres.*;
 import service.*;
-import service.reqres.*;
 import spark.*;
 
 import java.util.Collection;

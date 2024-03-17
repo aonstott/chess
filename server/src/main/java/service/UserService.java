@@ -4,7 +4,7 @@ import dataAccess.DataAccess;
 
 import java.util.Objects;
 import Exception.*;
-import service.reqres.LoginRequest;
+import reqres.LoginRequest;
 
 public class UserService {
 

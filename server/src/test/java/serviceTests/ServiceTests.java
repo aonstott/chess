@@ -1,15 +1,13 @@
 package serviceTests;
 
-import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import service.DataService;
 import Exception.*;
 import service.UserData;
 import service.*;
-import service.reqres.LoginRequest;
+import reqres.LoginRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 

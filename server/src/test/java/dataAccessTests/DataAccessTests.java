@@ -7,7 +7,7 @@ import service.DataService;
 import Exception.*;
 import service.UserData;
 import service.*;
-import service.reqres.LoginRequest;
+import reqres.LoginRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
