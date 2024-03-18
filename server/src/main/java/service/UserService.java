@@ -4,6 +4,7 @@ import dataAccess.DataAccess;
 
 import java.util.Objects;
 import Exception.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import reqres.LoginRequest;
 
 public class UserService {
@@ -37,10 +38,12 @@ public class UserService {
         {
             throw new LoginFailed(401, "Error: unauthorized");
         }
-        if (Objects.equals(info.password(), dao.getUser(info.username()).password()))
+        //if (Objects.equals(info.password(), dao.getUser(info.username()).password()))
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        System.out.println(dao.getUser(info.username()).password());
+        System.out.println(encoder.encode(info.password()));
+        if (encoder.matches(info.password(), dao.getUser(info.username()).password()))
         {
-            System.out.println(info.password());
-            System.out.println(dao.getUser(info.username()).password());
             return dao.createAuth(info.username());
         }
         else

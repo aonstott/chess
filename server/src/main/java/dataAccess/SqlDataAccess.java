@@ -9,6 +9,7 @@ import Exception.*;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import org.eclipse.jetty.server.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.AuthData;
 import service.GameData;
 import service.UserData;
@@ -70,7 +71,10 @@ public class SqlDataAccess implements DataAccess {
     {
         var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
         try {
-            executeUpdate(statement, user.username(), user.password(), user.email(), new Gson().toJson(user));
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String hashedPassword = encoder.encode(user.password());
+            UserData forDB = new UserData(user.username(), hashedPassword, user.email());
+            executeUpdate(statement, user.username(), hashedPassword, user.email(), new Gson().toJson(forDB));
         } catch (ResponseException e) {
             System.out.println("createUser");
             System.out.println(e.getMessage());

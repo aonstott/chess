@@ -111,6 +111,10 @@ public class PostLoginClient {
         return state;
     }
 
+    public void setState(int state) {
+        this.state = state;
+    }
+
     public void setAuthData(String authData) {
         this.authData = authData;
     }

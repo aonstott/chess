@@ -30,6 +30,7 @@ public class Repl {
                     if (state == 1)
                     {
                         postLoginClient.setAuthData(preLoginClient.getAuth());
+                        preLoginClient.setState(0);
                     }
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
                 } catch (Throwable e) {
@@ -45,6 +46,10 @@ public class Repl {
                 try {
                     result = postLoginClient.eval(line);
                     state = postLoginClient.getState();
+                    if (state == 0)
+                    {
+                        postLoginClient.setState(1);
+                    }
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
                 } catch (Throwable e) {
                     var msg = e.toString();
