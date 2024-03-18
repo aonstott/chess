@@ -37,6 +37,9 @@ public class GameService {
 
     public void updateGame(int gameID, String clientColor, AuthData authData) throws ResponseException {
         GameData currentGame = dataAccess.getGame(gameID);
+        if (clientColor != null) {
+            clientColor = clientColor.toUpperCase();
+        }
         //check that gameID exists
         if (dataAccess.getGame(gameID) == null) {
             throw new BadRequest(400, "No game with that ID");

@@ -7,8 +7,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Collection;
 
-import reqres.CreateGameRequest;
-import reqres.LoginRequest;
+import reqres.*;
 import service.*;
 
 public class ServerFacade {
@@ -20,14 +19,14 @@ public class ServerFacade {
     }
 
 
-    public AuthData register(UserData user) throws ResponseException {
+    public LoginResult register(UserData user) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, user, AuthData.class);
+        return this.makeRequest("POST", path, user, LoginResult.class);
     }
 
-    public AuthData login(LoginRequest info) throws ResponseException {
+    public LoginResult login(LoginRequest info) throws ResponseException {
         var path = "/session";
-        return this.makeRequest("POST", path, info, AuthData.class);
+        return this.makeRequest("POST", path, info, LoginResult.class);
     }
 
     public void logout(AuthData auth) throws ResponseException {
@@ -35,18 +34,18 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, "authorization", auth.getAuthToken(), null, null);
     }
 
-    public int createGame(String gameName, AuthData auth) throws ResponseException {
+    public CreateGameResponse createGame(CreateGameRequest gameName, AuthData auth) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("POST", path, "authorization", auth.getAuthToken(), gameName, int.class);
+        return this.makeRequest("POST", path, "authorization", auth.getAuthToken(), gameName, CreateGameResponse.class);
     }
 
-    public Collection<GameData> listGames(AuthData auth) throws ResponseException
+    public ListGamesResponse listGames(AuthData auth) throws ResponseException
     {
         var path = "/game";
-        return this.makeRequest("GET", path, "authorization", auth.getAuthToken(), null, null);
+        return this.makeRequest("GET", path, "authorization", auth.getAuthToken(), null, ListGamesResponse.class);
     }
 
-    public void updateGame(AuthData auth, CreateGameRequest req) throws ResponseException
+    public void updateGame(AuthData auth, UpdateGameRequest req) throws ResponseException
     {
         var path = "/game";
         this.makeRequest("PUT", path, "authorization", auth.getAuthToken(), req, null);

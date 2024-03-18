@@ -3,11 +3,16 @@ package client;
 import java.util.Arrays;
 import Exception.ResponseException;
 import reqres.LoginRequest;
+import reqres.LoginResult;
 import server.ServerFacade;
+import service.AuthData;
 import service.UserData;
 
 public class PreLoginClient {
     private final String serverURL;
+    private int state = 0;
+
+    private String auth = null;
     private final ServerFacade serverFacade;
     public PreLoginClient(String serverURL)
     {
@@ -44,10 +49,16 @@ public class PreLoginClient {
             String username = params[0];
             String password = params[1];
             LoginRequest info = new LoginRequest(username, password);
-            serverFacade.login(info);
+            LoginResult res = serverFacade.login(info);
+            this.auth = res.authToken();
+            state = 1;
             return String.format("You signed in as %s.", username);
         }
         throw new ResponseException(400, "Expected: <username> <password>");
+    }
+
+    public String getAuth() {
+        return auth;
     }
 
     public String register(String... params) throws ResponseException {
@@ -57,10 +68,15 @@ public class PreLoginClient {
             String password = params[1];
             String email = params[2];
             UserData user = new UserData(username, password, email);
-            serverFacade.register(user);
+            LoginResult res = serverFacade.register(user);
+            this.auth = res.authToken();
+            state = 1;
             return String.format("Registered user %s", username);
         }
         throw new ResponseException(400, "Expected: <username> <password> <email>");
     }
 
+    public int getState() {
+        return state;
+    }
 }
