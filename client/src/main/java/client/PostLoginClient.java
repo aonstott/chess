@@ -102,6 +102,7 @@ public class PostLoginClient {
             int gameID = Integer.parseInt(params[1]);
             UpdateGameRequest req = new UpdateGameRequest(playerColor, gameID);
             serverFacade.updateGame(info, req);
+            this.state = 2;
             return String.format("Joined as team %s", playerColor);
         }
         throw new ResponseException(400, "Expected: join <black or white> <game_id>");
@@ -113,6 +114,10 @@ public class PostLoginClient {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public String getAuthData() {
+        return authData;
     }
 
     public void setAuthData(String authData) {
