@@ -50,6 +50,12 @@ public class ServerFacade {
         var path = "/game";
         this.makeRequest("PUT", path, "authorization", auth.getAuthToken(), req, null);
     }
+
+    public void clear() throws ResponseException
+    {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         return makeRequest(method, path, null, null, request, responseClass);
     }
