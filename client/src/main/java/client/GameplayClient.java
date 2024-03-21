@@ -57,6 +57,17 @@ public class GameplayClient {
         }
         result.append(" +--------------------+\n");
 
+        result.append("  a\u2003b\u2003c\u2003d\u2003e\u2003f\u2003g\u2003h\n");
+        result.append(" +--------------------+\n");
+        for (int i = 7; i >= 0; i--) { // Start with row 7 and go down to row 0
+            result.append(i + 1).append("|");
+            for (int j = 7; j >= 0; j--) {
+                result.append(board[i][j]).append("|");
+            }
+            result.append("\n");
+        }
+        result.append(" +--------------------+\n");
+
         return result.toString();
     }
 
