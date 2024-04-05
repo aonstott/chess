@@ -60,7 +60,7 @@ public class Repl {
                     if (state == 2)
                     {
                         postLoginClient.setState(1);
-                        System.out.println(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.eval("draw"));
+                        System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.eval("draw"));
                     }
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
                 } catch (Throwable e) {
@@ -80,7 +80,7 @@ public class Repl {
                     {
                         gameplayClient.setState(2);
                     }
-                    System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + result);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + result);
                 } catch (Throwable e) {
                     var msg = e.toString();
                     System.out.print(msg);

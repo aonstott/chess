@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -12,6 +13,7 @@ public class GameplayClient {
     private int state = 2;
     private String authData;
     private final ServerFacade serverFacade;
+
     public GameplayClient(String serverURL, String authData)
     {
         this.serverURL = serverURL;

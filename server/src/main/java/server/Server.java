@@ -4,6 +4,7 @@ import dataAccess.DataAccess;
 import Exception.*;
 import dataAccess.SqlDataAccess;
 import reqres.*;
+import server.websocket.WebSocketHandler;
 import service.*;
 import spark.*;
 
@@ -15,11 +16,14 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
 
+    private WebSocketHandler webSocketHandler;
+
     public Server(DataAccess dataAccess)
     {
         this.dataService = new DataService(dataAccess);
         this.userService = new UserService(dataAccess);
         this.gameService = new GameService(dataAccess);
+        this.webSocketHandler = new WebSocketHandler();
     }
 
     public Server()
@@ -28,6 +32,7 @@ public class Server {
         this.dataService = new DataService(sql);
         this.userService = new UserService(sql);
         this.gameService = new GameService(sql);
+        this.webSocketHandler = new WebSocketHandler();
     }
 
 
@@ -201,6 +206,7 @@ public class Server {
         try
         {
             gameService.updateGame(requestInfo.gameID(), requestInfo.playerColor(), authorization);
+            webSocketHandler.beginSession(authorization.getAuthToken());
             res.status(200);
             return "{}";
         }

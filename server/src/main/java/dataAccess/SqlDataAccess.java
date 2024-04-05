@@ -153,9 +153,9 @@ public class SqlDataAccess implements DataAccess {
         var statement = "INSERT INTO games (name) VALUES (?)";
         try {
             int id = executeUpdate(statement, gameName);
-            var statement2 = "UPDATE games SET json = ? WHERE id = ?";
+            var statement2 = "UPDATE games SET game = ?, json = ? WHERE id = ?";
             GameData game = new GameData(gameName, id, null, null);
-            executeUpdate(statement2, new Gson().toJson(game), id);
+            executeUpdate(statement2, new Gson().toJson(game.getGame()), new Gson().toJson(game), id);
             return id;
         } catch (ResponseException e) {
             System.out.println("createUser");
@@ -283,6 +283,7 @@ public class SqlDataAccess implements DataAccess {
               `name` varchar(256) NOT NULL,
               `whiteUsername` varchar(256),
               `blackUsername` varchar(256),
+              `game` varchar(2048),
               `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`),
               INDEX(id)

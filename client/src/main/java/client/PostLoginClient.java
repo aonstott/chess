@@ -95,14 +95,26 @@ public class PostLoginClient {
     }
 
     public String updateGame(String... params) throws ResponseException {
-        if (params.length == 2)
+        if (params.length == 2 || params.length == 1)
         {
             AuthData info = new AuthData(authData);
-            String playerColor = params[0];
-            int gameID = Integer.parseInt(params[1]);
+            String playerColor = null;
+            int gameID = 0;
+            if (params.length == 2) {
+                playerColor = params[0];
+                gameID = Integer.parseInt(params[1]);
+            }
+            else {
+                gameID = Integer.parseInt(params[0]);
+
+            }
             UpdateGameRequest req = new UpdateGameRequest(playerColor, gameID);
             serverFacade.updateGame(info, req);
             this.state = 2;
+            if (playerColor == null)
+            {
+                return "Joined as observer";
+            }
             return String.format("Joined as team %s", playerColor);
         }
         throw new ResponseException(400, "Expected: join <black or white> <game_id>");
