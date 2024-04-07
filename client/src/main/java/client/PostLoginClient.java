@@ -22,6 +22,8 @@ public class PostLoginClient {
     private String authData;
     private final ServerFacade serverFacade;
 
+    private int gameID = 0;
+
     private final ServerMessageHandler serverMessageHandler;
     public PostLoginClient(String serverURL, String authData, ServerMessageHandler serverMessageHandler)
     {
@@ -132,6 +134,7 @@ public class PostLoginClient {
             UpdateGameRequest req = new UpdateGameRequest(playerColor, gameID);
             serverFacade.updateGame(info, req);
             this.state = 2;
+            this.gameID = gameID;
             if (playerColor == null)
             {
                 return "Joined as observer";
@@ -155,5 +158,9 @@ public class PostLoginClient {
 
     public void setAuthData(String authData) {
         this.authData = authData;
+    }
+
+    public int getGameID() {
+        return gameID;
     }
 }

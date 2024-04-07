@@ -77,6 +77,11 @@ public class GameService {
             throw new ResponseException(500, e.getMessage());
         }
     }
+
+    public GameData getGame(int gameID)
+    {
+        return dataAccess.getGame(gameID);
+    }
 }
 
 

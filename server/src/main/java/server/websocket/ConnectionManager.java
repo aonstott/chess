@@ -50,10 +50,28 @@ public class ConnectionManager {
         for (var c : connections.get(gameID)) {
             if (c.session.isOpen()) {
                 if (!c.authToken.equals(excludeUser)) {
-                    System.out.println(c.authToken);
                     String msg = new Gson().toJson(notification, Notification.class);
                     c.send(msg);
                 }
+            } else {
+                removeList.add(c);
+            }
+        }
+
+        // Clean up any connections that were left open.
+        for (var c : removeList) {
+            ArrayList<Connection> tmp = connections.get(gameID);
+            tmp.remove(c);
+            connections.put(gameID, tmp);
+        }
+    }
+
+    public void sendLoadCommand(int gameID, LoadGameMessage loadGameMessage) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.get(gameID)) {
+            if (c.session.isOpen()) {
+                String msg = new Gson().toJson(loadGameMessage, LoadGameMessage.class);
+                c.send(msg);
             } else {
                 removeList.add(c);
             }

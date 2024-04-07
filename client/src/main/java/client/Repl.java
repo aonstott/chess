@@ -2,6 +2,7 @@ package client;
 import client.websocket.ServerMessageHandler;
 import com.google.gson.Gson;
 import ui.EscapeSequences;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 
@@ -64,6 +65,7 @@ public class Repl implements ServerMessageHandler {
                     if (state == 2)
                     {
                         postLoginClient.setState(1);
+                        gameplayClient.setGameID(postLoginClient.getGameID());
                         System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.eval("draw"));
                     }
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
@@ -128,7 +130,8 @@ public class Repl implements ServerMessageHandler {
                 break;
             }
             case LOAD_GAME: {
-                System.out.println(gameplayClient.drawBoard());
+                LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                System.out.println(gameplayClient.drawBoard(loadGameMessage.getGame()));
             }
         }
     }

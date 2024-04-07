@@ -44,8 +44,12 @@ public class WebSocketHandler {
         String username = gameService.getUsername(new AuthData(auth));
         var message1 = String.format("Player %s has joined team: %s", username, teamColor.toString());
         var notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message1);
+        GameData gameData = gameService.getGame(gameID);
+        ChessGame game = gameData.getGame();
+        var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
         try {
             connections.broadcast(gameID, auth, notification);
+            connections.sendLoadCommand(gameID, loadGameMessage);
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());
         }

@@ -1,6 +1,9 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -11,6 +14,7 @@ public class GameplayClient {
     private final String serverURL;
 
     private int state = 2;
+    private int gameID;
     private String authData;
     private final ServerFacade serverFacade;
 
@@ -26,7 +30,7 @@ public class GameplayClient {
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "quit" -> "quit";
-            default -> drawBoard();
+            default -> help();
         };
     }
 
@@ -36,8 +40,9 @@ public class GameplayClient {
                 - Quit - exit chess application
                 """;
     }
-    public String drawBoard() {
-        String[][] board = {
+    public String drawBoard(ChessGame game) {
+        System.out.println("yeet");
+        /*String[][] board = {
                 {EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK},
                 {EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN},
                 {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
@@ -46,7 +51,79 @@ public class GameplayClient {
                 {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
                 {EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN},
                 {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP, EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK}
-        };
+        };*/
+
+        String[][] board = new String[8][8];
+        ChessBoard board2 = game.getBoard();
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                ChessPiece piece = board2.getPiece(new ChessPosition(i + 1, j + 1));
+                if (piece != null) {
+                    switch (piece.getPieceType())
+                    {
+                        case ChessPiece.PieceType.PAWN:
+                        {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                board[i][j] = EscapeSequences.WHITE_PAWN;
+                            else
+                                board[i][j] = EscapeSequences.BLACK_PAWN;
+                            break;
+                        }
+                        case ChessPiece.PieceType.KING:
+                        {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                board[i][j] = EscapeSequences.WHITE_KING;
+                            else
+                                board[i][j] = EscapeSequences.BLACK_KING;
+                            break;
+                        }
+                        case ChessPiece.PieceType.BISHOP:
+                        {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                board[i][j] = EscapeSequences.WHITE_BISHOP;
+                            else
+                                board[i][j] = EscapeSequences.BLACK_BISHOP;
+                            break;
+                        }
+                        case ChessPiece.PieceType.KNIGHT:
+                        {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                board[i][j] = EscapeSequences.WHITE_KNIGHT;
+                            else
+                                board[i][j] = EscapeSequences.BLACK_KNIGHT;
+                            break;
+                        }
+                        case ChessPiece.PieceType.ROOK:
+                        {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                board[i][j] = EscapeSequences.WHITE_ROOK;
+                            else
+                                board[i][j] = EscapeSequences.BLACK_ROOK;
+                            break;
+                        }
+                        case ChessPiece.PieceType.QUEEN:
+                        {
+                            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
+                                board[i][j] = EscapeSequences.WHITE_QUEEN;
+                            else
+                                board[i][j] = EscapeSequences.BLACK_QUEEN;
+                            break;
+                        }
+                        default:
+                        {
+                            board[i][j] = EscapeSequences.EMPTY;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    board[i][j] = EscapeSequences.EMPTY;
+                }
+            }
+        }
         StringBuilder result = new StringBuilder();
         result.append("  a\u2003b\u2003c\u2003d\u2003e\u2003f\u2003g\u2003h\n");
         result.append(" +--------------------+\n");
@@ -83,5 +160,13 @@ public class GameplayClient {
 
     public int getState() {
         return state;
+    }
+
+    public void setGameID(int gameID) {
+        this.gameID = gameID;
+    }
+
+    public int getGameID() {
+        return gameID;
     }
 }
