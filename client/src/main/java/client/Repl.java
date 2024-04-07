@@ -1,9 +1,13 @@
 package client;
+import client.websocket.ServerMessageHandler;
+import com.google.gson.Gson;
 import ui.EscapeSequences;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
 
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements ServerMessageHandler {
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
     private final GameplayClient gameplayClient;
@@ -12,7 +16,7 @@ public class Repl {
 
     public Repl(String serverUrl) {
         preLoginClient = new PreLoginClient(serverUrl);
-        postLoginClient = new PostLoginClient(serverUrl, preLoginClient.getAuth());
+        postLoginClient = new PostLoginClient(serverUrl, preLoginClient.getAuth(), this);
         gameplayClient = new GameplayClient(serverUrl, postLoginClient.getAuthData());
     }
 
@@ -114,4 +118,18 @@ public class Repl {
                 EscapeSequences.SET_TEXT_COLOR_WHITE + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 
+    @Override
+    public void handle(String message) {
+        ServerMessage sm = new Gson().fromJson(message, ServerMessage.class);
+        switch (sm.getServerMessageType()) {
+            case NOTIFICATION: {
+                Notification notification = new Gson().fromJson(message, Notification.class);
+                System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage());
+                break;
+            }
+            case LOAD_GAME: {
+                System.out.println(gameplayClient.drawBoard());
+            }
+        }
+    }
 }

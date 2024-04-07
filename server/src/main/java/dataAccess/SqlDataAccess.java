@@ -197,7 +197,7 @@ public class SqlDataAccess implements DataAccess {
         }
     }
 
-    private static String getUsername(AuthData authData) throws SQLException {
+    public static String getUsername(AuthData authData) throws SQLException {
         String username = "";
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT username FROM auth WHERE auth=?";

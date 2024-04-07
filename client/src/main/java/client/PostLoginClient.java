@@ -1,5 +1,8 @@
 package client;
 
+import chess.ChessGame;
+import client.websocket.ServerMessageHandler;
+import client.websocket.WebSocketFacade;
 import reqres.*;
 import server.ServerFacade;
 import Exception.ResponseException;
@@ -8,18 +11,24 @@ import service.GameData;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 public class PostLoginClient {
     private final String serverURL;
 
+    private WebSocketFacade ws;
+
     private int state = 1;
     private String authData;
     private final ServerFacade serverFacade;
-    public PostLoginClient(String serverURL, String authData)
+
+    private final ServerMessageHandler serverMessageHandler;
+    public PostLoginClient(String serverURL, String authData, ServerMessageHandler serverMessageHandler)
     {
         this.serverURL = serverURL;
         this.serverFacade = new ServerFacade(serverURL);
         this.authData = authData;
+        this.serverMessageHandler = serverMessageHandler;
     }
     public String eval(String input) {
         try {
@@ -97,16 +106,28 @@ public class PostLoginClient {
     public String updateGame(String... params) throws ResponseException {
         if (params.length == 2 || params.length == 1)
         {
+            this.ws = new WebSocketFacade(serverURL, serverMessageHandler);
             AuthData info = new AuthData(authData);
             String playerColor = null;
             int gameID = 0;
             if (params.length == 2) {
                 playerColor = params[0];
                 gameID = Integer.parseInt(params[1]);
+
+                ChessGame.TeamColor teamColor = null;
+                if (Objects.equals(playerColor, "black"))
+                    teamColor = ChessGame.TeamColor.BLACK;
+                else if (Objects.equals(playerColor, "white"))
+                {
+                    teamColor = ChessGame.TeamColor.WHITE;
+                }
+
+
+                ws.joinPlayer(info, gameID, teamColor);
             }
             else {
                 gameID = Integer.parseInt(params[0]);
-
+                ws.joinObserver(info, gameID);
             }
             UpdateGameRequest req = new UpdateGameRequest(playerColor, gameID);
             serverFacade.updateGame(info, req);

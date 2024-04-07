@@ -2,10 +2,12 @@ package service;
 
 import dataAccess.DataAccess;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Objects;
 
 import Exception.*;
+import dataAccess.SqlDataAccess;
 
 public class GameService {
     private final DataAccess dataAccess;
@@ -67,4 +69,14 @@ public class GameService {
         }
         dataAccess.updateGame(gameID, clientColor, authData);
     }
+
+    public String getUsername(AuthData auth) throws ResponseException {
+        try {
+            return SqlDataAccess.getUsername(auth);
+        } catch (SQLException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
 }
+
+
