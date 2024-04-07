@@ -32,6 +32,7 @@ public class WebSocketHandler {
         switch (cmd.getCommandType()) {
             case JOIN_PLAYER -> joinPlayer(message, session);
             case JOIN_OBSERVER -> joinObserver(message, session);
+            case MAKE_MOVE -> makeMove(message, session);
         }
     }
 
@@ -70,8 +71,45 @@ public class WebSocketHandler {
         }
     }
 
-    public void makeMove(String auth, ChessMove move) throws IOException{
+    public void makeMove(String message, Session session) throws ResponseException{
+        MakeMoveCommand cmd = new Gson().fromJson(message, MakeMoveCommand.class);
+        int gameID = cmd.getGameID();
+        String auth = cmd.getAuthString();
+        String username = gameService.getUsername(new AuthData(auth));
+        ChessGame game = gameService.getGame(gameID).getGame();
+        ChessMove move = cmd.getMove();
+        ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+        gameService.makeMove(gameID, new AuthData(auth), move);
+        var message1 = String.format("Player %s has moved %s from %s to %s", username, piece.toString(), move.getStartPosition().toString(), move.getEndPosition().toString());
+        var notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message1);
+        game = gameService.getGame(gameID).getGame();
+        var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
 
+
+        if (game.isInCheckmate(ChessGame.TeamColor.BLACK));
+        {
+            var endGameNotification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "White wins!");
+            try {
+                connections.broadcast(gameID, null, endGameNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
+        if (game.isInCheckmate(ChessGame.TeamColor.WHITE));
+        {
+            var endGameNotification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "Black wins!");
+            try {
+                connections.broadcast(gameID, null, endGameNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
+        try {
+            connections.broadcast(gameID, auth, notification);
+            connections.sendLoadCommand(gameID, loadGameMessage);
+        } catch (IOException e) {
+            throw new ResponseException(400, "makeMove wsHandler: " + e.getMessage());
+        }
     }
 
     public void leaveGame(String auth) throws IOException {

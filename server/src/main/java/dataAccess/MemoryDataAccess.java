@@ -1,5 +1,6 @@
 package dataAccess;
 
+import chess.ChessGame;
 import org.eclipse.jetty.server.Authentication;
 import service.AuthData;
 import service.GameData;
@@ -43,6 +44,11 @@ public class MemoryDataAccess implements DataAccess {
 
     public boolean authExists(AuthData authRequest) {
         return auth.containsKey(authRequest);
+    }
+
+    @Override
+    public void makeMove(int gameID, ChessGame game) {
+
     }
 
     public Collection<GameData> listGames() {

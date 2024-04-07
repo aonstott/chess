@@ -1,5 +1,8 @@
 package service;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataAccess.DataAccess;
 
 import java.sql.SQLException;
@@ -76,6 +79,28 @@ public class GameService {
         } catch (SQLException e) {
             throw new ResponseException(500, e.getMessage());
         }
+    }
+
+    public void makeMove(int gameID, AuthData auth, ChessMove move) throws ResponseException
+    {
+        System.out.println(move.getStartPosition().getRow());
+        System.out.println(move.getStartPosition().getColumn());
+        System.out.println(move.getEndPosition().getRow());
+        System.out.println(move.getEndPosition().getColumn());
+        if (dataAccess.getGame(gameID) == null) {
+            throw new BadRequest(400, "No game with that ID");
+        }
+        if (!checkAuth(auth)) {
+            throw new UnauthorizedException(401, "Unauthorized");
+        }
+        GameData gameData = getGame(gameID);
+        ChessGame game = gameData.getGame();
+        try {
+            game.makeMove(move);
+        } catch (InvalidMoveException e) {
+            throw new ResponseException(500, "Invalid move");
+        }
+        dataAccess.makeMove(gameID, game);
     }
 
     public GameData getGame(int gameID)

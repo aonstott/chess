@@ -1,5 +1,7 @@
 package dataAccess;
 
+import chess.ChessGame;
+import chess.ChessMove;
 import service.AuthData;
 import service.GameData;
 import service.UserData;
@@ -25,5 +27,7 @@ public interface DataAccess {
 
     void clear();
     boolean authExists(AuthData authRequest);
+
+    void makeMove(int gameID, ChessGame game);
 
 }

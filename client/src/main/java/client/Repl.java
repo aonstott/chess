@@ -18,7 +18,7 @@ public class Repl implements ServerMessageHandler {
     public Repl(String serverUrl) {
         preLoginClient = new PreLoginClient(serverUrl);
         postLoginClient = new PostLoginClient(serverUrl, preLoginClient.getAuth(), this);
-        gameplayClient = new GameplayClient(serverUrl, postLoginClient.getAuthData());
+        gameplayClient = new GameplayClient(serverUrl, postLoginClient.getAuthData(), this);
     }
 
     public void run() {
@@ -65,6 +65,8 @@ public class Repl implements ServerMessageHandler {
                     if (state == 2)
                     {
                         postLoginClient.setState(1);
+                        gameplayClient.setGameID(postLoginClient.getGameID());
+                        gameplayClient.setAuthData(postLoginClient.getAuthData());
                         System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.eval("draw"));
                     }
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);

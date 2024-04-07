@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import Exception.*;
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import org.eclipse.jetty.server.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -56,7 +57,6 @@ public class SqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getUser");
             System.out.println(e.getMessage());
         }
         return null;
@@ -76,7 +76,6 @@ public class SqlDataAccess implements DataAccess {
             UserData forDB = new UserData(user.username(), hashedPassword, user.email());
             executeUpdate(statement, user.username(), hashedPassword, user.email(), new Gson().toJson(forDB));
         } catch (ResponseException e) {
-            System.out.println("createUser");
             System.out.println(e.getMessage());
         }
     }
@@ -118,7 +117,6 @@ public class SqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getUser");
             System.out.println(e.getMessage());
         }
         return null;
@@ -137,7 +135,6 @@ public class SqlDataAccess implements DataAccess {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getUser");
             System.out.println(e.getMessage());
         }
         return null;
@@ -158,7 +155,6 @@ public class SqlDataAccess implements DataAccess {
             executeUpdate(statement2, new Gson().toJson(game.getGame()), new Gson().toJson(game), id);
             return id;
         } catch (ResponseException e) {
-            System.out.println("createUser");
             System.out.println(e.getMessage());
         }
         return 0;
@@ -169,10 +165,7 @@ public class SqlDataAccess implements DataAccess {
         try {
             GameData game = getGame(gameID);
             String username = getUsername(authData);
-            System.out.println("Updating");
             var statement = "SELECT username FROM auth WHERE auth=?";
-            System.out.println("here");
-            System.out.println(username);
             var statement2 = "";
             if (Objects.equals(clientColor, "WHITE"))
             {
@@ -250,7 +243,16 @@ public class SqlDataAccess implements DataAccess {
         return false;
     }
 
-
+    public void makeMove(int gameID, ChessGame game) {
+        try {
+            GameData gameData = getGame(gameID);
+            GameData newData = new GameData(gameData.getGameName(), gameID, gameData.getWhiteUsername(), gameData.getBlackUsername(), game);
+            var statement = "UPDATE games SET game=?, json=? WHERE id=?";
+            executeUpdate(statement, new Gson().toJson(game), new Gson().toJson(newData), gameID);
+        } catch (ResponseException e) {
+            System.out.println("Exception at makeMove in SQL Data access: " + e.getMessage());
+        }
+    }
 
     private int executeUpdate(String statement, Object... params) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
