@@ -65,7 +65,6 @@ public class Repl implements ServerMessageHandler {
                     if (state == 2)
                     {
                         postLoginClient.setState(1);
-                        gameplayClient.setGameID(postLoginClient.getGameID());
                         System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.eval("draw"));
                     }
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
@@ -78,6 +77,7 @@ public class Repl implements ServerMessageHandler {
             {
                 printPrompt();
                 String line = scanner.nextLine();
+                System.out.println(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_BLUE);
 
                 try {
                     result = gameplayClient.eval(line);
@@ -86,7 +86,8 @@ public class Repl implements ServerMessageHandler {
                     {
                         gameplayClient.setState(2);
                     }
-                    System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + result);
+                    System.out.print(result);
+                    System.out.println(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_BLUE);
                 } catch (Throwable e) {
                     var msg = e.toString();
                     System.out.print(msg);
@@ -116,7 +117,7 @@ public class Repl implements ServerMessageHandler {
 
 
     private void printPrompt() {
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "\n[" + this.evalState(this.state) + "] " +
+        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_GREEN + "\n[" + this.evalState(this.state) + "] " +
                 EscapeSequences.SET_TEXT_COLOR_WHITE + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 
@@ -127,11 +128,15 @@ public class Repl implements ServerMessageHandler {
             case NOTIFICATION: {
                 Notification notification = new Gson().fromJson(message, Notification.class);
                 System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage());
+                printPrompt();
                 break;
             }
             case LOAD_GAME: {
                 LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
-                System.out.println(gameplayClient.drawBoard(loadGameMessage.getGame()));
+                System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.drawBoard(loadGameMessage.getGame()));
+                System.out.println(EscapeSequences.SET_BG_COLOR_BLACK);
+                printPrompt();
+                break;
             }
         }
     }

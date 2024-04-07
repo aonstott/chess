@@ -13,8 +13,9 @@ import ui.EscapeSequences;
 public class GameplayClient {
     private final String serverURL;
 
+    private ChessGame chessGame;
+
     private int state = 2;
-    private int gameID;
     private String authData;
     private final ServerFacade serverFacade;
 
@@ -30,7 +31,9 @@ public class GameplayClient {
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "quit" -> "quit";
-            default -> help();
+            case "help" -> help();
+            case "draw" -> drawBoard(chessGame);
+            default -> "";
         };
     }
 
@@ -38,23 +41,14 @@ public class GameplayClient {
         return """
                 - Help - display available commands
                 - Quit - exit chess application
+                - Draw - draw the chess board for the current game
                 """;
     }
     public String drawBoard(ChessGame game) {
-        System.out.println("yeet");
-        /*String[][] board = {
-                {EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK},
-                {EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN},
-                {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP, EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK}
-        };*/
-
+        System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK);
         String[][] board = new String[8][8];
         ChessBoard board2 = game.getBoard();
+        this.chessGame = game;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -160,13 +154,5 @@ public class GameplayClient {
 
     public int getState() {
         return state;
-    }
-
-    public void setGameID(int gameID) {
-        this.gameID = gameID;
-    }
-
-    public int getGameID() {
-        return gameID;
     }
 }
