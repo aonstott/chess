@@ -83,10 +83,6 @@ public class GameService {
 
     public void makeMove(int gameID, AuthData auth, ChessMove move) throws ResponseException
     {
-        System.out.println(move.getStartPosition().getRow());
-        System.out.println(move.getStartPosition().getColumn());
-        System.out.println(move.getEndPosition().getRow());
-        System.out.println(move.getEndPosition().getColumn());
         if (dataAccess.getGame(gameID) == null) {
             throw new BadRequest(400, "No game with that ID");
         }
@@ -99,6 +95,17 @@ public class GameService {
             game.makeMove(move);
         } catch (InvalidMoveException e) {
             throw new ResponseException(500, "Invalid move");
+        }
+        dataAccess.makeMove(gameID, game);
+    }
+
+    public void setGame(int gameID, AuthData auth, ChessGame game) throws ResponseException
+    {
+        if (dataAccess.getGame(gameID) == null) {
+            throw new BadRequest(400, "No game with that ID");
+        }
+        if (!checkAuth(auth)) {
+            throw new UnauthorizedException(401, "Unauthorized");
         }
         dataAccess.makeMove(gameID, game);
     }

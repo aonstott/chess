@@ -3,7 +3,6 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
-import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import Exception.ResponseException;
 import dataAccess.SqlDataAccess;
@@ -33,6 +32,8 @@ public class WebSocketHandler {
             case JOIN_PLAYER -> joinPlayer(message, session);
             case JOIN_OBSERVER -> joinObserver(message, session);
             case MAKE_MOVE -> makeMove(message, session);
+            case LEAVE -> leaveGame(message, session);
+            case RESIGN -> resignGame(message, session);
         }
     }
 
@@ -40,7 +41,7 @@ public class WebSocketHandler {
         JoinPlayerCommand cmd = new Gson().fromJson(message, JoinPlayerCommand.class);
         int gameID = cmd.getGameID();
         String auth = cmd.getAuthString();
-        ChessGame.TeamColor teamColor = cmd.getTeamColor();
+        ChessGame.TeamColor teamColor = cmd.getPlayerColor();
         connections.add(gameID, auth, session);
         String username = gameService.getUsername(new AuthData(auth));
         var message1 = String.format("Player %s has joined team: %s", username, teamColor.toString());
@@ -50,7 +51,7 @@ public class WebSocketHandler {
         var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
         try {
             connections.broadcast(gameID, auth, notification);
-            connections.sendLoadCommand(gameID, loadGameMessage);
+            connections.sendOneLoadCommand(gameID, auth, loadGameMessage);
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());
         }
@@ -86,8 +87,10 @@ public class WebSocketHandler {
         var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
 
 
-        if (game.isInCheckmate(ChessGame.TeamColor.BLACK));
+        if (game.isInCheckmate(ChessGame.TeamColor.BLACK))
         {
+            game.setTeamTurn(null);
+            gameService.setGame(gameID, new AuthData(auth) , game);
             var endGameNotification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "White wins!");
             try {
                 connections.broadcast(gameID, null, endGameNotification);
@@ -95,8 +98,10 @@ public class WebSocketHandler {
                 throw new ResponseException(500, e.getMessage());
             }
         }
-        if (game.isInCheckmate(ChessGame.TeamColor.WHITE));
+        if (game.isInCheckmate(ChessGame.TeamColor.WHITE))
         {
+            game.setTeamTurn(null);
+            gameService.setGame(gameID, new AuthData(auth) , game);
             var endGameNotification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "Black wins!");
             try {
                 connections.broadcast(gameID, null, endGameNotification);
@@ -112,13 +117,38 @@ public class WebSocketHandler {
         }
     }
 
-    public void leaveGame(String auth) throws IOException {
-
+    public void leaveGame(String message, Session session) throws ResponseException {
+        LeaveCommand leaveCommand = new Gson().fromJson(message, LeaveCommand.class);
+        int gameID = leaveCommand.getGameID();
+        String auth = leaveCommand.getAuthString();
+        String username = gameService.getUsername(new AuthData(auth));
+        var message1 = String.format("Player %s has left", username);
+        var notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message1);
+        try {
+            connections.removeSessionFromGame(gameID, auth);
+            connections.removeSession(session);
+            connections.broadcast(gameID, auth, notification);
+        } catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        }
     }
 
-    public void resignGame()
-    {
+    public void resignGame(String message, Session session) throws ResponseException {
+        ResignCommand resignCommand = new Gson().fromJson(message, ResignCommand.class);
+        int gameID = resignCommand.getGameID();
+        String auth = resignCommand.getAuthString();
+        String username = gameService.getUsername(new AuthData(auth));
+        var message1 = String.format("Player %s has resigned", username);
+        var notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message1);
 
+        ChessGame game = gameService.getGame(gameID).getGame();
+        game.setTeamTurn(null);
+        gameService.setGame(gameID, new AuthData(auth), game);
+        try {
+            connections.broadcast(gameID, auth, notification);
+        } catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        }
     }
 
 }

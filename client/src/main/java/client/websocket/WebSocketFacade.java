@@ -8,9 +8,7 @@ import Exception.ResponseException;
 import service.AuthData;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinObserverCommand;
-import webSocketMessages.userCommands.JoinPlayerCommand;
-import webSocketMessages.userCommands.MakeMoveCommand;
+import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -66,6 +64,26 @@ public class WebSocketFacade extends Endpoint {
             this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    public void leaveGame(AuthData auth, int gameID) throws ResponseException
+    {
+        try {
+            var cmd = new LeaveCommand(auth.getAuthToken(), gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void resignGame(AuthData auth, int gameID) throws ResponseException
+    {
+        try {
+            var cmd = new ResignCommand(auth.getAuthToken(), gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
         }
     }
 

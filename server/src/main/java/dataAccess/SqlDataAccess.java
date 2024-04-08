@@ -9,6 +9,7 @@ import Exception.*;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.server.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.AuthData;
@@ -245,10 +246,12 @@ public class SqlDataAccess implements DataAccess {
 
     public void makeMove(int gameID, ChessGame game) {
         try {
+            Gson gson = new GsonBuilder().serializeNulls().create();
             GameData gameData = getGame(gameID);
             GameData newData = new GameData(gameData.getGameName(), gameID, gameData.getWhiteUsername(), gameData.getBlackUsername(), game);
             var statement = "UPDATE games SET game=?, json=? WHERE id=?";
-            executeUpdate(statement, new Gson().toJson(game), new Gson().toJson(newData), gameID);
+            executeUpdate(statement, gson.toJson(game), gson.toJson(newData), gameID);
+            System.out.println("updated");
         } catch (ResponseException e) {
             System.out.println("Exception at makeMove in SQL Data access: " + e.getMessage());
         }
