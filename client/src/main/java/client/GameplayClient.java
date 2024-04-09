@@ -26,13 +26,13 @@ public class GameplayClient {
 
     private final ServerMessageHandler serverMessageHandler;
 
-    public GameplayClient(String serverURL, String authData, ServerMessageHandler serverMessageHandler)
-    {
+    public GameplayClient(String serverURL, String authData, ServerMessageHandler serverMessageHandler) {
         this.serverURL = serverURL;
         this.serverFacade = new ServerFacade(serverURL);
         this.authData = authData;
         this.serverMessageHandler = serverMessageHandler;
     }
+
     public String eval(String input) {
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -62,95 +62,77 @@ public class GameplayClient {
                 """;
     }
 
-    public String highlightMoves(ChessGame game, String... params)
-    {
-        if (params.length != 1 || !isValidPosition(params[0]))
-        {
+    public String highlightMoves(ChessGame game, String... params) {
+        if (params.length != 1 || !isValidPosition(params[0])) {
             return "Usage: highlight <position>";
         }
         System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK);
         String[][] board = new String[8][8];
         ChessBoard board2 = game.getBoard();
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 ChessPiece piece = board2.getPiece(new ChessPosition(i + 1, j + 1));
                 if (piece != null) {
-                    switch (piece.getPieceType())
-                    {
-                        case ChessPiece.PieceType.PAWN:
-                        {
+                    switch (piece.getPieceType()) {
+                        case ChessPiece.PieceType.PAWN: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_PAWN;
                             else
                                 board[i][j] = EscapeSequences.BLACK_PAWN;
                             break;
                         }
-                        case ChessPiece.PieceType.KING:
-                        {
+                        case ChessPiece.PieceType.KING: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_KING;
                             else
                                 board[i][j] = EscapeSequences.BLACK_KING;
                             break;
                         }
-                        case ChessPiece.PieceType.BISHOP:
-                        {
+                        case ChessPiece.PieceType.BISHOP: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_BISHOP;
                             else
                                 board[i][j] = EscapeSequences.BLACK_BISHOP;
                             break;
                         }
-                        case ChessPiece.PieceType.KNIGHT:
-                        {
+                        case ChessPiece.PieceType.KNIGHT: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_KNIGHT;
                             else
                                 board[i][j] = EscapeSequences.BLACK_KNIGHT;
                             break;
                         }
-                        case ChessPiece.PieceType.ROOK:
-                        {
+                        case ChessPiece.PieceType.ROOK: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_ROOK;
                             else
                                 board[i][j] = EscapeSequences.BLACK_ROOK;
                             break;
                         }
-                        case ChessPiece.PieceType.QUEEN:
-                        {
+                        case ChessPiece.PieceType.QUEEN: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_QUEEN;
                             else
                                 board[i][j] = EscapeSequences.BLACK_QUEEN;
                             break;
                         }
-                        default:
-                        {
+                        default: {
                             board[i][j] = EscapeSequences.EMPTY;
                             break;
                         }
                     }
-                }
-                else
-                {
+                } else {
                     board[i][j] = EscapeSequences.EMPTY;
                 }
             }
         }
-
         ChessPosition piecePosition = convertPosition(params[0]);
         Collection<ChessMove> moves = game.validMoves(piecePosition);
-
-        for (ChessMove move : moves)
-        {
+        for (ChessMove move : moves) {
             int row = move.getEndPosition().getRow();
             int col = move.getEndPosition().getColumn();
             board[row - 1][col - 1] = "x";
         }
-
         StringBuilder result = new StringBuilder();
         result.append("  h\u2003g\u2003f\u2003e\u2003d\u2003c\u2003b\u2003a\n");
         result.append(" +--------------------+\n");
@@ -162,7 +144,6 @@ public class GameplayClient {
             result.append("\n");
         }
         result.append(" +--------------------+\n");
-
         result.append("  a\u2003b\u2003c\u2003d\u2003e\u2003f\u2003g\u2003h\n");
         result.append(" +--------------------+\n");
         for (int i = 0; i < 8; i++) { // Start with row 7 and go down to row 0
@@ -173,79 +154,67 @@ public class GameplayClient {
             result.append("\n");
         }
         result.append(" +--------------------+\n");
-
         return result.toString();
     }
+
     public String drawBoard(ChessGame game) {
         System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK);
         String[][] board = new String[8][8];
         ChessBoard board2 = game.getBoard();
         this.chessGame = game;
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 ChessPiece piece = board2.getPiece(new ChessPosition(i + 1, j + 1));
                 if (piece != null) {
-                    switch (piece.getPieceType())
-                    {
-                        case ChessPiece.PieceType.PAWN:
-                        {
+                    switch (piece.getPieceType()) {
+                        case ChessPiece.PieceType.PAWN: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_PAWN;
                             else
                                 board[i][j] = EscapeSequences.BLACK_PAWN;
                             break;
                         }
-                        case ChessPiece.PieceType.KING:
-                        {
+                        case ChessPiece.PieceType.KING: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_KING;
                             else
                                 board[i][j] = EscapeSequences.BLACK_KING;
                             break;
                         }
-                        case ChessPiece.PieceType.BISHOP:
-                        {
+                        case ChessPiece.PieceType.BISHOP: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_BISHOP;
                             else
                                 board[i][j] = EscapeSequences.BLACK_BISHOP;
                             break;
                         }
-                        case ChessPiece.PieceType.KNIGHT:
-                        {
+                        case ChessPiece.PieceType.KNIGHT: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_KNIGHT;
                             else
                                 board[i][j] = EscapeSequences.BLACK_KNIGHT;
                             break;
                         }
-                        case ChessPiece.PieceType.ROOK:
-                        {
+                        case ChessPiece.PieceType.ROOK: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_ROOK;
                             else
                                 board[i][j] = EscapeSequences.BLACK_ROOK;
                             break;
                         }
-                        case ChessPiece.PieceType.QUEEN:
-                        {
+                        case ChessPiece.PieceType.QUEEN: {
                             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
                                 board[i][j] = EscapeSequences.WHITE_QUEEN;
                             else
                                 board[i][j] = EscapeSequences.BLACK_QUEEN;
                             break;
                         }
-                        default:
-                        {
+                        default: {
                             board[i][j] = EscapeSequences.EMPTY;
                             break;
                         }
                     }
-                }
-                else
-                {
+                } else {
                     board[i][j] = EscapeSequences.EMPTY;
                 }
             }
@@ -275,15 +244,13 @@ public class GameplayClient {
 
         return result.toString();
     }
-    public String makeMove(String... params) throws ResponseException
-    {
-        if (params.length == 2)
-        {
+
+    public String makeMove(String... params) throws ResponseException {
+        if (params.length == 2) {
             this.ws = new WebSocketFacade(serverURL, serverMessageHandler);
             String startPos = params[0].toLowerCase();
             String endPos = params[1].toLowerCase();
-            if (!isValidPosition(startPos) || !isValidPosition(endPos))
-            {
+            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
                 return "Enter valid position letter a-h number 1-8:";
             }
             ChessPosition start = convertPosition(startPos);
@@ -291,71 +258,57 @@ public class GameplayClient {
             ChessMove move = new ChessMove(start, end, null);
             ws.makeMove(new AuthData(authData), gameID, move);
             return "Move succesful!";
-        }
-        else
-        {
+        } else {
             return "Format: move <start-position> <end-position>";
         }
     }
 
-    public String leaveGame() throws ResponseException
-    {
+    public String leaveGame() throws ResponseException {
         this.ws = new WebSocketFacade(serverURL, serverMessageHandler);
         ws.leaveGame(new AuthData(authData), gameID);
         this.state = 1;
         return "Left the game";
     }
 
-    public String resignGame() throws ResponseException
-    {
+    public String resignGame() throws ResponseException {
         this.ws = new WebSocketFacade(serverURL, serverMessageHandler);
         ws.resignGame(new AuthData(authData), gameID);
         return "Resigned from game";
     }
 
-    private ChessPosition convertPosition(String positionString)
-    {
+    private ChessPosition convertPosition(String positionString) {
         int row = 0;
         int col = 0;
-        switch (positionString.charAt(0))
-        {
-            case 'a':
-            {
+        switch (positionString.charAt(0)) {
+            case 'a': {
                 col = 1;
                 break;
             }
-            case 'b':
-            {
+            case 'b': {
                 col = 2;
                 break;
             }
-            case 'c':
-            {
+            case 'c': {
                 col = 3;
                 break;
             }
-            case 'd':
-            {
+            case 'd': {
                 col = 4;
                 break;
             }
-            case 'e':
-            {
+            case 'e': {
                 col = 5;
                 break;
             }
-            case 'f':
-            {
+            case 'f': {
                 col = 6;
                 break;
             }
-            case 'g':
-            {
+            case 'g': {
                 col = 7;
                 break;
             }
-            case 'h':
-            {
+            case 'h': {
                 col = 8;
                 break;
             }
@@ -364,8 +317,7 @@ public class GameplayClient {
         return new ChessPosition(row, col);
     }
 
-    private boolean isValidPosition(String positionString)
-    {
+    private boolean isValidPosition(String positionString) {
         if (positionString.length() != 2)
             return false;
         Set<Character> charSet = new HashSet<>();
