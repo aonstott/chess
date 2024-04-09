@@ -105,4 +105,27 @@ public class ConnectionManager {
             connections.put(gameID, tmp);
         }
     }
+
+    public void sendError(String authToken, ErrorMessage errorMessage) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (int gameID : connections.keySet()) {
+            for (var c : connections.get(gameID)) {
+                if (c.session.isOpen()) {
+                    if (c.authToken.equals(authToken)) {
+                        String msg = new Gson().toJson(errorMessage, ErrorMessage.class);
+                        c.send(msg);
+                    }
+                } else {
+                    removeList.add(c);
+                }
+            }
+
+            // Clean up any connections that were left open.
+            for (var c : removeList) {
+                ArrayList<Connection> tmp = connections.get(gameID);
+                tmp.remove(c);
+                connections.put(gameID, tmp);
+            }
+        }
+    }
 }

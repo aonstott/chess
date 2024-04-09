@@ -2,6 +2,7 @@ package client;
 import client.websocket.ServerMessageHandler;
 import com.google.gson.Gson;
 import ui.EscapeSequences;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
@@ -67,7 +68,7 @@ public class Repl implements ServerMessageHandler {
                         postLoginClient.setState(1);
                         gameplayClient.setGameID(postLoginClient.getGameID());
                         gameplayClient.setAuthData(postLoginClient.getAuthData());
-                        System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.eval("draw"));
+                        //System.out.println(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLACK + gameplayClient.eval("draw"));
                     }
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE + result);
                 } catch (Throwable e) {
@@ -127,6 +128,12 @@ public class Repl implements ServerMessageHandler {
     public void handle(String message) {
         ServerMessage sm = new Gson().fromJson(message, ServerMessage.class);
         switch (sm.getServerMessageType()) {
+            case ERROR:
+            {
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println(errorMessage.getErrorMessage());
+                break;
+            }
             case NOTIFICATION: {
                 Notification notification = new Gson().fromJson(message, Notification.class);
                 System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notification.getMessage());

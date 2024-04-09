@@ -123,6 +123,8 @@ public class PostLoginClient {
                 {
                     teamColor = ChessGame.TeamColor.WHITE;
                 }
+                UpdateGameRequest req = new UpdateGameRequest(playerColor, gameID);
+                serverFacade.updateGame(info, req);
 
 
                 ws.joinPlayer(info, gameID, teamColor);
@@ -131,8 +133,8 @@ public class PostLoginClient {
                 gameID = Integer.parseInt(params[0]);
                 ws.joinObserver(info, gameID);
             }
-            UpdateGameRequest req = new UpdateGameRequest(playerColor, gameID);
-            serverFacade.updateGame(info, req);
+            //UpdateGameRequest req = new UpdateGameRequest(playerColor, gameID);
+            //serverFacade.updateGame(info, req);
             this.state = 2;
             this.gameID = gameID;
             if (playerColor == null)

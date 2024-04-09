@@ -4,10 +4,14 @@ import dataAccess.DataAccess;
 import Exception.*;
 import dataAccess.SqlDataAccess;
 import reqres.*;
+import server.websocket.ConnectionManager;
 import server.websocket.WebSocketHandler;
 import service.*;
 import spark.*;
+import webSocketMessages.serverMessages.ErrorMessage;
+import webSocketMessages.serverMessages.ServerMessage;
 
+import java.io.IOException;
 import java.util.Collection;
 
 public class Server {
@@ -221,7 +225,6 @@ public class Server {
             System.out.println(e.getMessage());
             res.status(e.statusCode());
             return "{ \"message\": \"Error: bad request\" }";
-
         }
         catch (AlreadyTakenException e)
         {
