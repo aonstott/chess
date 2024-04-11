@@ -178,7 +178,24 @@ public class WebSocketHandler {
         game = gameService.getGame(gameID).getGame();
         var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
 
-
+        if (game.isInCheck(ChessGame.TeamColor.BLACK)
+        ) {
+            var checkNotification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "Black is in check!");
+            try {
+                connections.broadcast(gameID, null, checkNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
+        if (game.isInCheck(ChessGame.TeamColor.WHITE)
+        ) {
+            var checkNotification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, "White is in check!");
+            try {
+                connections.broadcast(gameID, null, checkNotification);
+            } catch (IOException e) {
+                throw new ResponseException(500, e.getMessage());
+            }
+        }
         if (game.isInCheckmate(ChessGame.TeamColor.BLACK))
         {
             game.setTeamTurn(null);
