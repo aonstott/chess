@@ -59,6 +59,9 @@ public class GameplayClient {
                 - Quit - exit chess application
                 - Draw - draw the chess board for the current game
                 - Move - make a move <start-position> <end-position>
+                - Highlight - highlight moves for a piece <piece-position>
+                - Leave - leave the game
+                - Resign - Forfeit the game (you will be given a loss and game will be ended)
                 """;
     }
 
@@ -257,7 +260,7 @@ public class GameplayClient {
             ChessPosition end = convertPosition(endPos);
             ChessMove move = new ChessMove(start, end, null);
             ws.makeMove(new AuthData(authData), gameID, move);
-            return "Move succesful!";
+            return "";
         } else {
             return "Format: move <start-position> <end-position>";
         }

@@ -3,6 +3,7 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import Exception.ResponseException;
 import dataAccess.SqlDataAccess;
@@ -172,7 +173,7 @@ public class WebSocketHandler {
         }
 
 
-        var message1 = String.format("Player %s has moved %s from %s to %s", username, piece.toString(), move.getStartPosition().toString(), move.getEndPosition().toString());
+        var message1 = String.format("Player %s has moved %s from %s to %s", username, piece.getPieceType().toString(), convertPos(move.getStartPosition()), convertPos(move.getEndPosition()));
         var notification = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, message1);
         game = gameService.getGame(gameID).getGame();
         var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
@@ -206,6 +207,48 @@ public class WebSocketHandler {
         } catch (IOException e) {
             throw new ResponseException(400, "makeMove wsHandler: " + e.getMessage());
         }
+    }
+
+    public String convertPos(ChessPosition pos)
+    {
+        String str = "";
+        switch (pos.getColumn())
+        {
+            case 1: {
+                str += "a";
+                break;
+            }
+            case 2: {
+                str += "b";
+                break;
+            }
+            case 3: {
+                str += "c";
+                break;
+            }
+            case 4: {
+                str += "d";
+                break;
+            }
+            case 5: {
+                str += "e";
+                break;
+            }
+            case 6: {
+                str += "f";
+                break;
+            }
+            case 7: {
+                str += "g";
+                break;
+            }
+            case 8: {
+                str += "h";
+                break;
+            }
+        }
+        str += (pos.getRow());
+        return str;
     }
 
     public void leaveGame(String message, Session session) throws ResponseException {
